@@ -1,20 +1,21 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Modding;
 using Satchel;
 using UnityEngine;
 using static Satchel.EnemyUtils;
 using Object = UnityEngine.Object;
 
-namespace Changeling
+namespace Silksong
 {
-    public class Changeling : Mod
+    public class Silksong : Mod
     {
 
-        internal static Changeling Instance;
+        internal static Silksong Instance;
         public GameObject BossPrefab,current;
         public GameObject NpcPrefab;
         public GameObject BossGo, NpcGo;
-        
+        new public string GetName() => "Silksong (but not really)";
+
         public enum Hornets
         {
             Boss = 0,

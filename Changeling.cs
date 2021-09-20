@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-
 using Modding;
+using Satchel;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-
-using HutongGames.PlayMaker.Actions;
-
-using static Modding.Logger;
-using static Satchel.GameObjectUtils;
-using static Satchel.FsmUtil;
 using static Satchel.EnemyUtils;
-using static Satchel.AnimationUtils;
+using Object = UnityEngine.Object;
 
 namespace Changeling
 {
@@ -21,13 +11,24 @@ namespace Changeling
     {
 
         internal static Changeling Instance;
-        public GameObject Prefab,current; 
+        public GameObject BossPrefab,current;
+        public GameObject NpcPrefab;
+        public GameObject BossGo, NpcGo;
+        
+        public enum Hornets
+        {
+            Boss = 0,
+            NPC
+        }
+
+        public int CurrentHornet;
 
         public string currentSourceClip,currentDestinationClip;  
 
         public tk2dSpriteAnimator source,destination; 
 
-        public Dictionary<string,string> clips =  new Dictionary<string,string>(){
+        public Dictionary<string,string> clips =  new Dictionary<string,string>()
+        {
             {"Idle","Idle"},
             {"Idle Hurt","Wounded"},
             {"Recoil","Barb Throw Recover"},
@@ -84,12 +85,6 @@ namespace Changeling
             {"Surface In","Land"},
             {"Thorn Attack","Sphere Attack"},
             {"Enter","Sphere Antic G"},
-            {"Sit","Counter Antic"},
-            {"Sit Idle","Counter Stance"},
-            {"Sit Lean","Counter Stance"},
-            {"Wake","Counter End"},
-            {"Get Off","Counter End"},
-            {"Sitting Asleep","Counter Stance"},
             {"Prostrate","Sphere Recover G"},
             {"Prostrate Rise","Sphere Recover G"},
             {"Challenge Start","Flourish"},
@@ -133,45 +128,44 @@ namespace Changeling
             {"DG Warp","Fall"},
             {"DG Warp Cancel","Idle"},
             {"DG Warp In","Fall"},
-        };   
+        };
+
+        public Dictionary<string, string> NpcClips = new Dictionary<string, string>()
+        {
+            {"Sit","Den Idle"},
+            {"Sit Idle","Den Idle"},
+            {"Sit Lean","Den Idle"},
+            {"Sitting Asleep","Den Idle"},
+            {"Wake","Den Idle"},
+            {"Get Off","Den Idle"},
+        };
+            
+            
         public override string GetVersion()
         {
             return "0.1";
         }
 
 
-        public GameObject createChangeling(GameObject ft = null){
-            var changed = Prefab.createCompanionFromPrefab();
-            //add control and adjust parameters
-            //var cc = changed.GetAddComponent<ChangelingControl>();
-            //if(ft != null){
-            //    cc.followTarget = ft;
-            //}
-            //fix up collider size
-            /*var collider = changed.GetAddComponent<BoxCollider2D>();
-            collider.size = new Vector2(1f,2.0f);
-            collider.offset = new Vector2(0f,-0.4f);
-            // add animations
-            gc.Animations.Add("Idle","Idle");
-            gc.Animations.Add("Idle","Freed Fake");
-            gc.Animations.Add("Idle","Cry Turn");
-            gc.Animations.Add("Idle","Idle");
-            // extract audios
-            var pfsm = grub.GetComponent<PlayMakerFSM>();
-            if(pfsm != null){
-                gc.teleport = pfsm.GetAction<AudioPlayRandom>("Hero Close",1).audioClips[0];
-                gc.yay = pfsm.GetAction<AudioPlayRandom>("Leave",0).audioClips[0];
-                gc.walk = pfsm.GetAction<AudioPlay>("Dig",0).oneShotClip.Value as AudioClip;
-            }*/
+        public GameObject createChangeling(GameObject go)
+        {
+            var changed = go.createCompanionFromPrefab();
             changed.SetActive(true);
+            
+            changed.transform.position =
+                HeroController.instance.gameObject.transform.position + new Vector3(0f, 0f, 0f);
+            changed.transform.SetParent(HeroController.instance.gameObject.transform, true);
+            
             return changed;
         }
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
-            Prefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
-            UnityEngine.Object.DontDestroyOnLoad(Prefab);
+            BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
+            NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
+            Object.DontDestroyOnLoad(BossPrefab);
+            Object.DontDestroyOnLoad(NpcPrefab);
             ModHooks.HeroUpdateHook += update;
         }
        
@@ -179,48 +173,125 @@ namespace Changeling
         {
             return new List<(string, string)>
             {
-                ("GG_Hornet_2", "Boss Holder/Hornet Boss 2")
+                ("GG_Hornet_2", "Boss Holder/Hornet Boss 2"),
+                ("Deepnest_Spider_Town", "Hornet Beast Den NPC")
             };   
         }
 
         
-        public void Change(){
-            if(current != null){ return; }
-            current = createChangeling();
-            current.transform.position = HeroController.instance.gameObject.transform.position + new Vector3(0f,0f,0f);
-            current.transform.SetParent(HeroController.instance.gameObject.transform,true);
-            var currentr = current.GetComponent<MeshRenderer>();
-            currentr.enabled = true;
+        public void Change()
+        {
+            if (current != null)
+            {
+                return;
+            }
+            
+            CreateHornet();
+
             // todo remove later
             HeroController.instance.gameObject.logTk2dAnimationClips();
-            Prefab.logTk2dAnimationClips();
+            BossPrefab.logTk2dAnimationClips();
+            NpcPrefab.logTk2dAnimationClips();
         }
 
-        public void CheckClips(){
-            if(source == null){
+        public void CheckClips()
+        {
+            if(source == null)
+            {
                 source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
             }
 
-            if(destination == null){
+            if(destination == null)
+            {
                 destination = current.GetComponent<tk2dSpriteAnimator>();
             }
+            
             var clip =  source.CurrentClip.name;
-            if(clip != currentSourceClip){
+            if(clip != currentSourceClip)
+            {
                 currentSourceClip = clip;
-                if(clips.TryGetValue(currentSourceClip,out var dclip)){
+                if (clips.TryGetValue(currentSourceClip, out var dclip))
+                {
+                    if (CurrentHornet != (int) Hornets.Boss)
+                    {
+                        CurrentHornet = (int) Hornets.Boss;
+                        UpdateHornet();
+                    }
                     currentDestinationClip = dclip;
                     destination.Play(currentDestinationClip);
+                    
+                }
+                else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2))
+                {
+                    if (CurrentHornet != (int) Hornets.NPC)
+                    {
+                        CurrentHornet = (int) Hornets.NPC;
+                        UpdateHornet();
+                    }
+                    currentDestinationClip = dclip2;
+                    destination.Play(currentDestinationClip);
+                }
+            }
+        }
+
+        public void UpdateHornet()
+        {
+            CreateHornet();
+            destination = current.GetComponent<tk2dSpriteAnimator>();
+        }
+        
+        public void CreateHornet()
+        {
+            if (CurrentHornet == (int) Hornets.Boss)
+            {
+                if (BossGo == null)
+                {
+                    BossGo = createChangeling(BossPrefab);
+                }
+                BossGo.GetComponent<MeshRenderer>().enabled = true;
+
+                DisableOtherHornets();
+
+                current = BossGo;
+            }
+
+            if (CurrentHornet == (int) Hornets.NPC)
+            {
+                if (NpcGo == null)
+                {
+                    NpcGo = createChangeling(NpcPrefab);
+                }
+                NpcGo.GetComponent<MeshRenderer>().enabled = true;
+                
+                DisableOtherHornets();
+                
+                current = NpcGo;
+            }
+
+        }
+
+        private void DisableOtherHornets()
+        {
+            if (CurrentHornet == (int) Hornets.Boss)
+            {
+                if (NpcGo != null)
+                {
+                    NpcGo.GetComponent<MeshRenderer>().enabled = false;
+                }
+            }
+            if (CurrentHornet == (int) Hornets.NPC)
+            {
+                if (BossGo != null)
+                {
+                    BossGo.GetComponent<MeshRenderer>().enabled = false;
                 }
             }
         }
         public void update()
         {   
-            var r = HeroController.instance.gameObject.GetComponent<MeshRenderer>();
-            r.enabled = false;
+            HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             Change();
             CheckClips();
         }
-
     }
-
 }

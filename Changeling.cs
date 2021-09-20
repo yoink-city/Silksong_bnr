@@ -21,7 +21,7 @@ namespace Changeling
             NPC
         }
 
-        public int CurrentHornet;
+        public Hornets CurrentHornet = Hornets.Boss;
 
         public string currentSourceClip,currentDestinationClip;  
 
@@ -35,7 +35,6 @@ namespace Changeling
             {"Run","Run"},
             {"Sprint","Run"},
             {"Land","Land"},
-            {"Dash","G Dash"},
             {"Walk","Run"},
             {"Map Walk","Run"},
             {"Shadow Dash","A Dash"},
@@ -78,7 +77,6 @@ namespace Changeling
             {"Map Turn","Idle"},
             {"Death Dream","Death Air"},
             {"Wall Slide","Wall Impact"},
-            {"Turn","Evade Antic"},
             {"DN Charge","Sphere Antic G"},
             {"Surface Swim","Fall"},
             {"Surface Idle","Idle"},
@@ -87,8 +85,6 @@ namespace Changeling
             {"Enter","Sphere Antic G"},
             {"Prostrate","Sphere Recover G"},
             {"Prostrate Rise","Sphere Recover G"},
-            {"Challenge Start","Flourish"},
-            {"Challenge End","Flourish"},
             {"TurnToBG","Sphere Antic G"},
             {"SD Charge Ground","Sphere Antic G"},
             {"SD Charge Ground End","Sphere Antic G"},
@@ -134,29 +130,56 @@ namespace Changeling
         {
             {"Sit","Den Idle"},
             {"Sit Idle","Den Idle"},
-            {"Sit Lean","Den Idle"},
-            {"Sitting Asleep","Den Idle"},
-            {"Wake","Den Idle"},
+            {"Sit Lean","Den Talk R"},
+            {"Sitting Asleep","Den Talk R"},
+            {"Wake","Den End R"},
             {"Get Off","Den Idle"},
+            {"Dash","Harpoon Side"},
+            {"TurnToIdle","TurnToIdle"},
+            {"Turn","Turn"},
+            {"Challenge Start","Point"},
+            {"Challenge End","Point End"}
         };
             
             
         public override string GetVersion()
         {
-            return "0.1";
+            return "0.2";
         }
 
 
         public GameObject createChangeling(GameObject go)
         {
+            var hero = HeroController.instance.gameObject;
             var changed = go.createCompanionFromPrefab();
             changed.SetActive(true);
-            
-            changed.transform.position =
-                HeroController.instance.gameObject.transform.position + new Vector3(0f, 0f, 0f);
-            changed.transform.SetParent(HeroController.instance.gameObject.transform, true);
-            
+            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
+            changed.transform.SetParent(hero.transform, true);
             return changed;
+        }
+
+        public void SetCurrentHornet()
+        {
+
+            if (BossGo == null)
+            {
+                BossGo = createChangeling(BossPrefab);
+            }
+
+            if (NpcGo == null)
+            {
+                NpcGo = createChangeling(NpcPrefab);
+            }
+
+            if (CurrentHornet == Hornets.Boss){
+                current = BossGo;
+            } else if (CurrentHornet == Hornets.NPC) {
+                current = NpcGo;
+            }
+
+            DisableOtherHornets();
+            current.GetComponent<MeshRenderer>().enabled = true;
+
         }
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
@@ -186,7 +209,7 @@ namespace Changeling
                 return;
             }
             
-            CreateHornet();
+            SetCurrentHornet();
 
             // todo remove later
             HeroController.instance.gameObject.logTk2dAnimationClips();
@@ -194,92 +217,60 @@ namespace Changeling
             NpcPrefab.logTk2dAnimationClips();
         }
 
-        public void CheckClips()
+        public void ImitateClips()
         {
-            if(source == null)
-            {
+            if(source == null){
                 source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
             }
 
-            if(destination == null)
-            {
-                destination = current.GetComponent<tk2dSpriteAnimator>();
+            if(destination == null){
+                destination = GetCurrentAnimator();
             }
             
             var clip =  source.CurrentClip.name;
+            
             if(clip != currentSourceClip)
             {
                 currentSourceClip = clip;
-                if (clips.TryGetValue(currentSourceClip, out var dclip))
-                {
-                    if (CurrentHornet != (int) Hornets.Boss)
+                if (clips.TryGetValue(currentSourceClip, out var dclip)) {
+                    if (CurrentHornet != Hornets.Boss)
                     {
-                        CurrentHornet = (int) Hornets.Boss;
-                        UpdateHornet();
+                        CurrentHornet = Hornets.Boss;
+                        destination = GetCurrentAnimator();
                     }
                     currentDestinationClip = dclip;
                     destination.Play(currentDestinationClip);
-                    
-                }
-                else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2))
-                {
-                    if (CurrentHornet != (int) Hornets.NPC)
+                } else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2)) {
+                    if (CurrentHornet != Hornets.NPC)
                     {
-                        CurrentHornet = (int) Hornets.NPC;
-                        UpdateHornet();
+                        CurrentHornet = Hornets.NPC;
+                        destination = GetCurrentAnimator();
                     }
                     currentDestinationClip = dclip2;
                     destination.Play(currentDestinationClip);
                 }
+
             }
         }
 
-        public void UpdateHornet()
+        public tk2dSpriteAnimator GetCurrentAnimator()
         {
-            CreateHornet();
-            destination = current.GetComponent<tk2dSpriteAnimator>();
+            SetCurrentHornet();
+            return current.GetComponent<tk2dSpriteAnimator>();
         }
         
-        public void CreateHornet()
-        {
-            if (CurrentHornet == (int) Hornets.Boss)
-            {
-                if (BossGo == null)
-                {
-                    BossGo = createChangeling(BossPrefab);
-                }
-                BossGo.GetComponent<MeshRenderer>().enabled = true;
-
-                DisableOtherHornets();
-
-                current = BossGo;
-            }
-
-            if (CurrentHornet == (int) Hornets.NPC)
-            {
-                if (NpcGo == null)
-                {
-                    NpcGo = createChangeling(NpcPrefab);
-                }
-                NpcGo.GetComponent<MeshRenderer>().enabled = true;
-                
-                DisableOtherHornets();
-                
-                current = NpcGo;
-            }
-
-        }
+        
 
         private void DisableOtherHornets()
         {
-            if (CurrentHornet == (int) Hornets.Boss)
+            if (CurrentHornet == Hornets.Boss)
             {
                 if (NpcGo != null)
                 {
                     NpcGo.GetComponent<MeshRenderer>().enabled = false;
                 }
             }
-            if (CurrentHornet == (int) Hornets.NPC)
+            if (CurrentHornet == Hornets.NPC)
             {
                 if (BossGo != null)
                 {
@@ -291,7 +282,7 @@ namespace Changeling
         {   
             HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             Change();
-            CheckClips();
+            ImitateClips();
         }
     }
 }

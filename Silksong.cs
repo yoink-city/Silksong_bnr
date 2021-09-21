@@ -157,7 +157,7 @@ namespace Silksong
             if (SilkSongTitle == null)
             {
                 //Fix this part cuz idk how satchel works
-                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("Silksong.Images.Title.png");
+                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("Silksong.Images.SilkSongTitle.png");
             }
             
             self.Title.sprite = SilkSongTitle;
@@ -228,7 +228,6 @@ namespace Silksong
             
             DisableOtherHornets();
             current.GetComponent<MeshRenderer>().enabled = true;
-
         }
         
         private GameObject CreateChangeling(GameObject go)

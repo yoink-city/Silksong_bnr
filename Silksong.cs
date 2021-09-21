@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Modding;
 using Satchel;
 using UnityEngine;
@@ -11,24 +13,22 @@ namespace Silksong
     {
 
         internal static Silksong Instance;
-        public GameObject BossPrefab,current;
-        public GameObject NpcPrefab;
-        public GameObject BossGo, NpcGo;
-        new public string GetName() => "Silksong (but not really)";
-
+        private static GameObject BossPrefab,NpcPrefab, current;
+        private static GameObject BossGo, NpcGo;
+        private static Sprite SilkSongTitle = null;
+        
+        private static string currentSourceClip,currentDestinationClip;
+        private static tk2dSpriteAnimator source,destination; 
+        
         public enum Hornets
         {
             Boss = 0,
             NPC
         }
 
-        public Hornets CurrentHornet = Hornets.Boss;
+        private static Hornets CurrentHornet = Hornets.Boss;
 
-        public string currentSourceClip,currentDestinationClip;  
-
-        public tk2dSpriteAnimator source,destination; 
-
-        public Dictionary<string,string> clips =  new Dictionary<string,string>()
+        private static Dictionary<string,string> clips =  new Dictionary<string,string>()
         {
             {"Idle","Idle"},
             {"Idle Hurt","Wounded"},
@@ -126,8 +126,8 @@ namespace Silksong
             {"DG Warp Cancel","Idle"},
             {"DG Warp In","Fall"},
         };
-
-        public Dictionary<string, string> NpcClips = new Dictionary<string, string>()
+        
+        private static Dictionary<string, string> NpcClips = new Dictionary<string, string>()
         {
             {"Sit","Den Idle"},
             {"Sit Idle","Den Idle"},
@@ -143,56 +143,26 @@ namespace Silksong
         };
             
             
-        public override string GetVersion()
+        public override string GetVersion() => "v0.2.0 - 0";
+        public new string GetName() => "Silksong (but not really)";
+
+        public Silksong()
         {
-            return "0.2";
+            //In constructor because initialize too late
+            On.MenuStyleTitle.SetTitle += FixBanner;
         }
 
-
-        public GameObject createChangeling(GameObject go)
+        private void FixBanner(On.MenuStyleTitle.orig_SetTitle orig, MenuStyleTitle self, int index)
         {
-            var hero = HeroController.instance.gameObject;
-            var changed = go.createCompanionFromPrefab();
-            changed.SetActive(true);
-            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
-            changed.transform.SetParent(hero.transform, true);
-            return changed;
-        }
-
-        public void SetCurrentHornet()
-        {
-
-            if (BossGo == null)
+            if (SilkSongTitle == null)
             {
-                BossGo = createChangeling(BossPrefab);
+                //Fix this part cuz idk how satchel works
+                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("Silksong.Images.Title.png");
             }
-
-            if (NpcGo == null)
-            {
-                NpcGo = createChangeling(NpcPrefab);
-            }
-
-            if (CurrentHornet == Hornets.Boss){
-                current = BossGo;
-            } else if (CurrentHornet == Hornets.NPC) {
-                current = NpcGo;
-            }
-
-            DisableOtherHornets();
-            current.GetComponent<MeshRenderer>().enabled = true;
-
+            
+            self.Title.sprite = SilkSongTitle;
         }
 
-        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
-        {
-            Instance = this;
-            BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
-            NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
-            Object.DontDestroyOnLoad(BossPrefab);
-            Object.DontDestroyOnLoad(NpcPrefab);
-            ModHooks.HeroUpdateHook += update;
-        }
-       
         public override List<(string, string)> GetPreloadNames()
         {
             return new List<(string, string)>
@@ -202,8 +172,26 @@ namespace Silksong
             };   
         }
 
+        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
+        {
+            Instance = this;
+            BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
+            NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
+            
+            Object.DontDestroyOnLoad(BossPrefab);
+            Object.DontDestroyOnLoad(NpcPrefab);
+            
+            ModHooks.HeroUpdateHook += Update;
+        }
         
-        public void Change()
+        private void Update()
+        {   
+            HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            ChangeToHornet();
+            ImitateClips();
+        }
+        
+        private void ChangeToHornet()
         {
             if (current != null)
             {
@@ -217,14 +205,69 @@ namespace Silksong
             BossPrefab.logTk2dAnimationClips();
             NpcPrefab.logTk2dAnimationClips();
         }
-
-        public void ImitateClips()
+        
+        private void SetCurrentHornet()
         {
-            if(source == null){
+
+            if (BossGo == null)
+            {
+                BossGo = CreateChangeling(BossPrefab);
+            }
+
+            if (NpcGo == null)
+            {
+                NpcGo = CreateChangeling(NpcPrefab);
+            }
+
+            current = CurrentHornet switch
+            {
+                Hornets.Boss => BossGo,
+                Hornets.NPC  => NpcGo,
+            };
+            
+            
+            DisableOtherHornets();
+            current.GetComponent<MeshRenderer>().enabled = true;
+
+        }
+        
+        private GameObject CreateChangeling(GameObject go)
+        {
+            var hero = HeroController.instance.gameObject;
+            var changed = go.createCompanionFromPrefab();
+            changed.SetActive(true);
+            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
+            changed.transform.SetParent(hero.transform, true);
+            return changed;
+        }
+        
+        private void DisableOtherHornets()
+        {
+            if (CurrentHornet == Hornets.Boss)
+            {
+                if (NpcGo != null)
+                {
+                    NpcGo.GetComponent<MeshRenderer>().enabled = false;
+                }
+            }
+            if (CurrentHornet == Hornets.NPC)
+            {
+                if (BossGo != null)
+                {
+                    BossGo.GetComponent<MeshRenderer>().enabled = false;
+                }
+            }
+        }
+
+        private void ImitateClips()
+        {
+            if(source == null)
+            {
                 source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
             }
 
-            if(destination == null){
+            if(destination == null)
+            {
                 destination = GetCurrentAnimator();
             }
             
@@ -254,36 +297,10 @@ namespace Silksong
             }
         }
 
-        public tk2dSpriteAnimator GetCurrentAnimator()
+        private tk2dSpriteAnimator GetCurrentAnimator()
         {
             SetCurrentHornet();
             return current.GetComponent<tk2dSpriteAnimator>();
-        }
-        
-        
-
-        private void DisableOtherHornets()
-        {
-            if (CurrentHornet == Hornets.Boss)
-            {
-                if (NpcGo != null)
-                {
-                    NpcGo.GetComponent<MeshRenderer>().enabled = false;
-                }
-            }
-            if (CurrentHornet == Hornets.NPC)
-            {
-                if (BossGo != null)
-                {
-                    BossGo.GetComponent<MeshRenderer>().enabled = false;
-                }
-            }
-        }
-        public void update()
-        {   
-            HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
-            Change();
-            ImitateClips();
         }
     }
 }

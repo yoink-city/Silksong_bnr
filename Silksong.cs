@@ -196,7 +196,7 @@ namespace Silksong
                 tempStrings.Add(kvp.Key);
             }
             ModHooks.HeroUpdateHook += Update;
-            ModHooks.AfterPlayerDeadHook += () => {
+            ModHooks.BeforePlayerDeadHook += () => {
                 Log("Dead");
                 hasDied = true;
                 lastDeathTime = DateTime.Now;
@@ -343,7 +343,6 @@ namespace Silksong
             var clip = source.CurrentClip.name;
             if(hasDied && (DateTime.Now - lastDeathTime).TotalMilliseconds < 3000){
                 lastDeathTime = DateTime.Now;
-                hasDied = false;
                 if(deathsource != null && deathsource.Playing){
                     clip = deathsource.CurrentClip.name;
                 }
@@ -368,7 +367,8 @@ namespace Silksong
                     if(destination != null){
                         destination.Play(currentDestinationClip);
                     }
-                } else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2)) {
+                } 
+                if (NpcClips.TryGetValue(currentSourceClip, out var dclip2)) {
                     if (CurrentHornet != Hornets.NPC)
                     {
                         CurrentHornet = Hornets.NPC;

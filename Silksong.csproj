@@ -87,10 +87,11 @@
   </ItemGroup>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-  </PropertyGroup>
+  <ItemGroup>
+      <EmbeddedResource Include="Images\SilkSongTitle.png" />
+  </ItemGroup>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(HollowKnightModsDirectory)\$(AssemblyName)"/>
-    </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(HollowKnightModsDirectory)\$(AssemblyName)"/>
+  </Target>
 </Project>

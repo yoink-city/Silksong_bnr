@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
 using Modding;
 using Satchel;
 using UnityEngine;
@@ -15,10 +16,10 @@ namespace Silksong
         internal static Silksong Instance;
         private static GameObject BossPrefab,NpcPrefab, current;
         private static GameObject BossGo, NpcGo;
-        private static Sprite SilkSongTitle = null;
+        private static Sprite SilkSongTitle;
         
         private static string currentSourceClip,currentDestinationClip;
-        private static tk2dSpriteAnimator source,destination; 
+        private static tk2dSpriteAnimator source,deathsource,spikedeathsource,aciddeathsource,destination; 
         
         public enum Hornets
         {
@@ -26,7 +27,7 @@ namespace Silksong
             NPC
         }
 
-        private static Hornets CurrentHornet = Hornets.Boss;
+        private static Hornets CurrentHornet = Hornets.NPC;
 
         private Dictionary<string,AudioClip> Audios;
         //Hornet_Fight_Flourish_02
@@ -91,7 +92,7 @@ namespace Silksong
             {"Wall Slide","Wall Impact"},
             {"DN Charge","Sphere Antic G"},
             {"Surface Swim","Fall"},
-            {"Surface Idle","Idle"},
+            {"Surface Idle","Fall"},
             {"Surface In","Land"},
             {"Thorn Attack","Sphere Attack"},
             {"Enter","Sphere Antic G"},
@@ -141,7 +142,7 @@ namespace Silksong
         private static Dictionary<string, string> NpcClips = new Dictionary<string, string>()
         {
             {"Sit","Den Idle"},
-            {"Sit Idle","Den Idle"},
+            {"Sit Idle","Den Talk R"},
             {"Sit Lean","Den Talk R"},
             {"Sitting Asleep","Den Talk R"},
             {"Wake","Den End R"},
@@ -154,24 +155,21 @@ namespace Silksong
         };
             
             
-        public override string GetVersion() => "v0.2.0 - 0";
+        public override string GetVersion() => "v0.3.0 - 0";
         public new string GetName() => "Silksong (but not really)";
 
         public Silksong()
         {
-
+            if (SilkSongTitle == null)
+            {
+                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("SilkSongTitle.png");
+            }
             //In constructor because initialize too late
             On.MenuStyleTitle.SetTitle += FixBanner;
         }
 
         private void FixBanner(On.MenuStyleTitle.orig_SetTitle orig, MenuStyleTitle self, int index)
         {
-            if (SilkSongTitle == null)
-            {
-                //Fix this part cuz idk how satchel works
-                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("Silksong.Images.SilkSongTitle.png");
-            }
-            
             self.Title.sprite = SilkSongTitle;
         }
 
@@ -198,10 +196,15 @@ namespace Silksong
                 tempStrings.Add(kvp.Key);
             }
             ModHooks.HeroUpdateHook += Update;
+            ModHooks.AfterPlayerDeadHook += () => {
+                Log("Dead");
+                hasDied = true;
+                lastDeathTime = DateTime.Now;
+            };
         }
-        
         private void Update()
         {   
+            
             HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             ChangeToHornet();
             ImitateClips();
@@ -212,6 +215,9 @@ namespace Silksong
                 } else {
                     i+=1;
                 }
+                HeroController.instance.gameObject.logTk2dAnimationClips();
+                BossPrefab.logTk2dAnimationClips();
+                NpcPrefab.logTk2dAnimationClips();
                 GameObjectUtils.PrintAllActiveGameObjectsInScene();  
             }
         }
@@ -222,13 +228,7 @@ namespace Silksong
             {
                 return;
             }
-            
             SetCurrentHornet();
-
-            // todo remove later
-            HeroController.instance.gameObject.logTk2dAnimationClips();
-            BossPrefab.logTk2dAnimationClips();
-            NpcPrefab.logTk2dAnimationClips();
         }
         
         private void SetCurrentHornet()
@@ -262,7 +262,7 @@ namespace Silksong
             var changed = go.createCompanionFromPrefab();
             changed.name = "h0rnet";
             changed.SetActive(true);
-            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
+            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0.001f);
             changed.transform.SetParent(hero.transform, true);
             return changed;
         }
@@ -286,21 +286,75 @@ namespace Silksong
         }
 
         public Dictionary<string,string> lastClipForSource = new Dictionary<string,string>();
+
+        public DateTime lastDeathTime = DateTime.Now;
+        public bool hasDied = false;
  
         private void ImitateClips()
         {
             if(source == null)
             {
                 source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
+                if(source == null){
+                    return;
+                }
+            }
+
+            if(deathsource == null){
+                var heroDeath = HeroController.instance.gameObject.Find("Hero Death");
+                if(heroDeath != null){
+                    var mr = heroDeath.GetComponent<MeshRenderer>();
+                    if(mr != null){
+                        mr.enabled = false;
+                    }
+                    deathsource = heroDeath.GetComponent<tk2dSpriteAnimator>();
+                }
+            }
+            if(spikedeathsource == null){
+                var heroDeath = HeroController.instance.gameObject.Find("Knight Spike Death");
+                if(heroDeath != null){
+                    var mr = heroDeath.GetComponent<MeshRenderer>();
+                    if(mr != null){
+                        mr.enabled = false;
+                    }
+                    spikedeathsource = heroDeath.GetComponent<tk2dSpriteAnimator>();
+                }
+            }
+
+            if(aciddeathsource == null){
+                var heroDeath = HeroController.instance.gameObject.Find("Knight Acid Death");
+                if(heroDeath != null){
+                    var mr = heroDeath.GetComponent<MeshRenderer>();
+                    if(mr != null){
+                        mr.enabled = false;
+                    }
+                    aciddeathsource = heroDeath.GetComponent<tk2dSpriteAnimator>();
+                }
             }
 
             if(destination == null)
             {
                 destination = GetCurrentAnimator();
+                if(destination == null){
+                    return;
+                }
             }
-            
-            var clip =  source.CurrentClip.name;
-            
+
+            var clip = source.CurrentClip.name;
+            if(hasDied && (DateTime.Now - lastDeathTime).TotalMilliseconds < 3000){
+                lastDeathTime = DateTime.Now;
+                hasDied = false;
+                if(deathsource != null && deathsource.Playing){
+                    clip = deathsource.CurrentClip.name;
+                }
+                if(spikedeathsource != null && spikedeathsource.Playing){
+                    clip = spikedeathsource.CurrentClip.name;
+                }
+                if(aciddeathsource != null && aciddeathsource.Playing){
+                    clip = aciddeathsource.CurrentClip.name;
+                }
+            }
+
             if(clip != currentSourceClip)
             {
                 currentSourceClip = clip;
@@ -311,7 +365,9 @@ namespace Silksong
                         destination = GetCurrentAnimator();
                     }
                     currentDestinationClip = dclip;
-                    destination.Play(currentDestinationClip);
+                    if(destination != null){
+                        destination.Play(currentDestinationClip);
+                    }
                 } else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2)) {
                     if (CurrentHornet != Hornets.NPC)
                     {
@@ -319,21 +375,28 @@ namespace Silksong
                         destination = GetCurrentAnimator();
                     }
                     currentDestinationClip = dclip2;
-                    destination.Play(currentDestinationClip);
+                    if(destination != null){
+                        destination.Play(currentDestinationClip);
+                    }
                 }
+
                 // simple way to handle audios
-                var roll = Random.Range(0.0f, 1.0f);
-                if(currentDestinationClip == "Death Air"){
+                var roll = UnityEngine.Random.Range(0.0f, 1.0f);
+                if(currentSourceClip != null && currentSourceClip.Contains("Death")){
                     if(roll < 0.5f){
                         playAudio("Hornet_Fight_Stun_01", true);
                     } else {
                         playAudio("Hornet_Fight_Stun_03", true);
                     }
                 }
-                if(currentDestinationClip.Contains("Point")){
-                    if(roll < 0.1f){
+                if(currentDestinationClip != null && currentDestinationClip.Contains("Point")){
+                    if(roll < 0.6f){
                         playAudio("Hornet_Fight_Flourish_02", false);
-                    } 
+                    }else if(roll < 0.8f) {
+                        playAudio("Hornet_Fight_Yell_09", false);
+                    } else {
+                        playAudio("Hornet_Fight_Laugh_02", false);
+                    }
                 }
                 if(currentDestinationClip == "Land"){
                     if(roll < 0.1f){
@@ -342,7 +405,7 @@ namespace Silksong
                         playAudio("Hornet_Fight_Laugh_02", false);
                     }
                 }
-                if(currentSourceClip.Contains("Slash")){
+                if(currentSourceClip != null && currentSourceClip.Contains("Slash")){
                     if(roll < 0.01f){
                         playAudio("Hornet_Fight_Yell_04", false);
                     } else if(roll < 0.02f) {

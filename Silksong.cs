@@ -28,6 +28,17 @@ namespace Silksong
 
         public tk2dSpriteAnimator source,destination; 
 
+        private Dictionary<string,AudioClip> Audios;
+        //Hornet_Fight_Flourish_02
+        //Hornet_Fight_Laugh_01
+        //Hornet_Fight_Laugh_02
+        //Hornet_Fight_Stun_01
+        //Hornet_Fight_Stun_03
+        //Hornet_Fight_Yell_04
+        //Hornet_Fight_Yell_06
+        //Hornet_Fight_Yell_08
+        //Hornet_Fight_Yell_09
+
         public Dictionary<string,string> clips =  new Dictionary<string,string>()
         {
             {"Idle","Idle"},
@@ -153,6 +164,7 @@ namespace Silksong
         {
             var hero = HeroController.instance.gameObject;
             var changed = go.createCompanionFromPrefab();
+            changed.name = "h0rnet";
             changed.SetActive(true);
             changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
             changed.transform.SetParent(hero.transform, true);
@@ -183,6 +195,7 @@ namespace Silksong
 
         }
 
+        public List<string> tempStrings = new List<string>();
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
@@ -190,6 +203,10 @@ namespace Silksong
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
             Object.DontDestroyOnLoad(BossPrefab);
             Object.DontDestroyOnLoad(NpcPrefab);
+            Audios = BossPrefab.GetComponent<PlayMakerFSM>().getAudioClips();
+            foreach(KeyValuePair<string,AudioClip> kvp in Audios){
+                tempStrings.Add(kvp.Key);
+            }
             ModHooks.HeroUpdateHook += update;
         }
        
@@ -218,9 +235,11 @@ namespace Silksong
             NpcPrefab.logTk2dAnimationClips();
         }
 
+        public Dictionary<string,string> lastClipForSource = new Dictionary<string,string>();
+        public tk2dSpriteAnimator[] sources;
         public void ImitateClips()
         {
-            if(source == null){
+            if(source == null){ 
                 source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
             }
 
@@ -250,7 +269,38 @@ namespace Silksong
                     currentDestinationClip = dclip2;
                     destination.Play(currentDestinationClip);
                 }
-
+                // simple way to handle audios
+                var roll = Random.Range(0.0f, 1.0f);
+                if(currentDestinationClip == "Death Air"){
+                    if(roll < 0.5f){
+                        playAudio("Hornet_Fight_Stun_01", true);
+                    } else {
+                        playAudio("Hornet_Fight_Stun_03", true);
+                    }
+                }
+                if(currentDestinationClip.Contains("Point")){
+                    if(roll < 0.1f){
+                        playAudio("Hornet_Fight_Flourish_02", false);
+                    } 
+                }
+                if(currentDestinationClip == "Land"){
+                    if(roll < 0.1f){
+                        playAudio("Hornet_Fight_Laugh_01", false);
+                    } else if(roll < 0.2f) {
+                        playAudio("Hornet_Fight_Laugh_02", false);
+                    }
+                }
+                if(currentSourceClip.Contains("Slash")){
+                    if(roll < 0.01f){
+                        playAudio("Hornet_Fight_Yell_04", false);
+                    } else if(roll < 0.02f) {
+                        playAudio("Hornet_Fight_Yell_06", false);
+                    } else if(roll < 0.03f) {
+                        playAudio("Hornet_Fight_Yell_08", false);
+                    } else if(roll < 0.04f) {
+                        playAudio("Hornet_Fight_Yell_09", false);
+                    }
+                }
             }
         }
 
@@ -279,11 +329,30 @@ namespace Silksong
                 }
             }
         }
+
+        public int i = 0;
+
+        public AudioSource audioSource;
+        public void playAudio(string clipName, bool force){
+            audioSource = current.GetAddComponent<AudioSource>();
+            if(audioSource.isPlaying && !force) { return;}
+            if(Audios != null && Audios.TryGetValue(clipName,out var clip)){
+                audioSource.PlayOneShot(clip);
+            } 
+        }
         public void update()
         {   
             HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             Change();
             ImitateClips();
+            if(Input.GetKeyDown(KeyCode.Space)){
+                if(i >= tempStrings.Count){
+                    i = 0;
+                } else {
+                    i+=1;
+                }
+                GameObjectUtils.PrintAllActiveGameObjectsInScene();  
+            }
         }
     }
 }

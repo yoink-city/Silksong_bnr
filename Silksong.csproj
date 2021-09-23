@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <VanillaFiles>..\Vanilla</VanillaFiles>
-    <ModdingAPi>..\HollowKnight.Modding\OutputFinal</ModdingAPi>
+    <ModdingAPI>..\HollowKnight.Modding\OutputFinal</ModdingAPI>
     <HollowKnightModsDirectory>..\linkedtoHKMods</HollowKnightModsDirectory>
     <TargetFrameworkProfile />
 
@@ -41,18 +41,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>
+    <ItemGroup>
     <Reference Include="System.Core" />
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(ModdingAPi)\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(ModdingAPI)\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule">
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -62,28 +62,30 @@
       <HintPath>$(VanillaFiles)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>lib\UnityEngine.AudioModule.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(VanillaFiles)\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>lib\UnityEngine.ImageConversionModule.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(VanillaFiles)\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>lib\UnityEngine.Physics2DModule.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(VanillaFiles)\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\PlayMaker.dll</HintPath>
     </Reference>
     <Reference Include="Satchel">
-      <HintPath>..\Satchel\bin\Debug\Satchel.dll</HintPath>
+      <HintPath>$(ModdingAPI)\Mods\Satchel\Satchel.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(ModdingAPI)\MMHook_Assembly-Csharp.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="Silksong.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
   </PropertyGroup>

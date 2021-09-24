@@ -1,11 +1,14 @@
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
 using Modding;
 using Satchel;
 using UnityEngine;
 using static Satchel.EnemyUtils;
+using static Satchel.AssemblyUtils;
 using Object = UnityEngine.Object;
+using Silksong.Hornet;
 
 namespace Silksong
 {
@@ -13,154 +16,37 @@ namespace Silksong
     {
 
         internal static Silksong Instance;
-        private static GameObject BossPrefab,NpcPrefab, current;
-        private static GameObject BossGo, NpcGo;
-        private static Sprite SilkSongTitle = null;
-        
-        private static string currentSourceClip,currentDestinationClip;
-        private static tk2dSpriteAnimator source,destination; 
-        
-        public enum Hornets
-        {
-            Boss = 0,
-            NPC
-        }
+        public static GameObject BossPrefab,NpcPrefab,ControllerGo;
 
-        private static Hornets CurrentHornet = Hornets.Boss;
-
-        private static Dictionary<string,string> clips =  new Dictionary<string,string>()
-        {
-            {"Idle","Idle"},
-            {"Idle Hurt","Wounded"},
-            {"Recoil","Barb Throw Recover"},
-            {"Run","Run"},
-            {"Sprint","Run"},
-            {"Land","Land"},
-            {"Walk","Run"},
-            {"Map Walk","Run"},
-            {"Shadow Dash","A Dash"},
-            {"Airborne","Fall"},
-            {"Double Jump","Jump"},
-            {"Death","Death Air"},
-            {"Slash","Throw"},
-            {"SlashAlt","Throw Antic"},
-            {"Fireball Antic","Throw Antic"},
-            {"Fireball1 Cast","Throw"},
-            {"Focus","Sphere Antic G"},
-            {"Focus Get","Sphere Antic G"},
-            {"Focus Get Once","Sphere Antic G"},
-            {"Focus End","Land"},
-            {"HardLand","Hard Land"},
-            {"Spike Death","Death Air"},
-            {"Collect Magical 1","Sphere Antic A"},
-            {"Collect Magical 2","Sphere Antic A"},
-            {"Collect Magical 3","Sphere Antic A"},
-            {"Collect Normal 1","Sphere Antic A"},
-            {"Collect Normal 2","Sphere Antic A"},
-            {"Collect Normal 3","Sphere Antic A"},
-            {"Acid Death","Death Air"},
-            {"Idle Wind","Idle"},
-            {"Fall","Fall"},
-            {"Collect Magical Fall","Sphere Recover A"},
-            {"Collect Magical Land","Land"},
-            {"Collect Heart Piece","Sphere Recover A"},
-            {"Collect Heart Piece End","Land"},
-            {"Roar Lock","Flourish"},
-            {"Stun","Stun"},
-            {"Run To Idle","Run"},
-            {"Map Idle","Idle"},
-            {"SD Hit Wall","Wall Impact"},
-            {"SD Wall Charge","Wall Impact"},
-            {"Lantern Idle","Idle"},
-            {"Lantern Run","Run"},
-            {"Fireball2 Cast","Throw"},
-            {"Map Open","Idle"},
-            {"Map Turn","Idle"},
-            {"Death Dream","Death Air"},
-            {"Wall Slide","Wall Impact"},
-            {"DN Charge","Sphere Antic G"},
-            {"Surface Swim","Fall"},
-            {"Surface Idle","Idle"},
-            {"Surface In","Land"},
-            {"Thorn Attack","Sphere Attack"},
-            {"Enter","Sphere Antic G"},
-            {"Prostrate","Sphere Recover G"},
-            {"Prostrate Rise","Sphere Recover G"},
-            {"TurnToBG","Sphere Antic G"},
-            {"SD Charge Ground","Sphere Antic G"},
-            {"SD Charge Ground End","Sphere Antic G"},
-            {"SD Dash","A Dash"},
-            {"SD Air Brake","Evade"},
-            {"Exit","Sphere Antic G"},
-            {"UpSlash","Counter Attack 2"},
-            {"DownSlash","Evade"},
-            {"NA Big Slash","Counter Attack 1"},
-            {"NA Dash Slash","Counter Attack 1"},
-            {"Dash Down Land","Hard Land"},
-            {"Quake Land","Hard Land"},
-            {"Super Hard Land","Hard Land"},
-            {"Dreamer Land","Land"},
-            {"Dreamer Lift","Fall"},
-            {"Walljump","Jump"},
-            {"Shadow Dash Down","Hard Land"},
-            {"Shadow Dash Sharp","A Dash"},
-            {"DJ Get Land","Land"},
-            {"Shadow Dash Down Sharp","Hard Land"},
-            {"Spike Death Antic","Death Air"},
-            {"NA Charge","Sphere Antic G"},
-            {"NA Cyclone","Sphere Attack"},
-            {"NA Cyclone End","Sphere Recover A"},
-            {"NA Cyclone Start","Sphere Antic A"},
-            {"Quake Fall 2","Fall"},
-            {"Quake Land 2","Hard Land"},
-            {"Scream","Jump"},
-            {"Scream Start","Jump Antic"},
-            {"Scream 2","Jump"},
-            {"DN Cancel","Throw Recover"},
-            {"DN Slash Antic","Throw Antic"},
-            {"DN Slash","Throw"},
-            {"DG Set Charge","Land"},
-            {"DG Set End","Idle"},
-            {"DG Warp Charge","Sphere Antic G"},
-            {"DG Warp","Fall"},
-            {"DG Warp Cancel","Idle"},
-            {"DG Warp In","Fall"},
-        };
-        
-        private static Dictionary<string, string> NpcClips = new Dictionary<string, string>()
-        {
-            {"Sit","Den Idle"},
-            {"Sit Idle","Den Idle"},
-            {"Sit Lean","Den Talk R"},
-            {"Sitting Asleep","Den Talk R"},
-            {"Wake","Den End R"},
-            {"Get Off","Den Idle"},
-            {"Dash","Harpoon Side"},
-            {"TurnToIdle","TurnToIdle"},
-            {"Turn","Turn"},
-            {"Challenge Start","Point"},
-            {"Challenge End","Point End"}
-        };
+        public static Controller ControllerScript;
+        private static Sprite SilkSongTitle;
             
-            
-        public override string GetVersion() => "v0.2.0 - 0";
+        public override string GetVersion() => "v0.3.0 - 0";
         public new string GetName() => "Silksong (but not really)";
 
         public Silksong()
         {
+            if (SilkSongTitle == null)
+            {
+                SilkSongTitle = GetSpriteFromResources("SilkSongTitle.png");
+            }
             //In constructor because initialize too late
             On.MenuStyleTitle.SetTitle += FixBanner;
         }
-
         private void FixBanner(On.MenuStyleTitle.orig_SetTitle orig, MenuStyleTitle self, int index)
         {
-            if (SilkSongTitle == null)
-            {
-                //Fix this part cuz idk how satchel works
-                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("Silksong.Images.SilkSongTitle.png");
-            }
-            
             self.Title.sprite = SilkSongTitle;
+            var tcl = GameObject.Find("TeamCherryLogo");
+            var ycl = GameObject.Find("YoinkCityLogo");
+            if(tcl != null && ycl == null){
+                ycl = new GameObject();
+                ycl.name = "YoinkCityLogo";
+                ycl.transform.position = tcl.transform.position + new Vector3(0.75f, 0.2f, 0f);
+                ycl.transform.localScale = new Vector3(0.11f,0.11f,1f);
+                ycl.transform.SetParent(tcl.transform, true);
+                var sr = ycl.GetAddComponent<SpriteRenderer>();
+                sr.sprite = GetSpriteFromResources("YoinkCity.png");
+            }
         }
 
         public override List<(string, string)> GetPreloadNames()
@@ -177,129 +63,19 @@ namespace Silksong
             Instance = this;
             BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
-            
             Object.DontDestroyOnLoad(BossPrefab);
             Object.DontDestroyOnLoad(NpcPrefab);
-            
-            ModHooks.HeroUpdateHook += Update;
+            CreateHornetController();
+        }
+
+        public void CreateHornetController(){
+            ControllerGo = new GameObject();
+            ControllerGo.name = "SilksongController";
+            ControllerScript = ControllerGo.GetAddComponent<Controller>();
+            ControllerScript.Init(BossPrefab,NpcPrefab);
+            ControllerGo.SetActive(true);
+            Object.DontDestroyOnLoad(ControllerGo);
         }
         
-        private void Update()
-        {   
-            HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
-            ChangeToHornet();
-            ImitateClips();
-        }
-        
-        private void ChangeToHornet()
-        {
-            if (current != null)
-            {
-                return;
-            }
-            
-            SetCurrentHornet();
-
-            // todo remove later
-            HeroController.instance.gameObject.logTk2dAnimationClips();
-            BossPrefab.logTk2dAnimationClips();
-            NpcPrefab.logTk2dAnimationClips();
-        }
-        
-        private void SetCurrentHornet()
-        {
-
-            if (BossGo == null)
-            {
-                BossGo = CreateChangeling(BossPrefab);
-            }
-
-            if (NpcGo == null)
-            {
-                NpcGo = CreateChangeling(NpcPrefab);
-            }
-
-            current = CurrentHornet switch
-            {
-                Hornets.Boss => BossGo,
-                Hornets.NPC  => NpcGo,
-            };
-            
-            
-            DisableOtherHornets();
-            current.GetComponent<MeshRenderer>().enabled = true;
-        }
-        
-        private GameObject CreateChangeling(GameObject go)
-        {
-            var hero = HeroController.instance.gameObject;
-            var changed = go.createCompanionFromPrefab();
-            changed.SetActive(true);
-            changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0f);
-            changed.transform.SetParent(hero.transform, true);
-            return changed;
-        }
-        
-        private void DisableOtherHornets()
-        {
-            if (CurrentHornet == Hornets.Boss)
-            {
-                if (NpcGo != null)
-                {
-                    NpcGo.GetComponent<MeshRenderer>().enabled = false;
-                }
-            }
-            if (CurrentHornet == Hornets.NPC)
-            {
-                if (BossGo != null)
-                {
-                    BossGo.GetComponent<MeshRenderer>().enabled = false;
-                }
-            }
-        }
-
-        private void ImitateClips()
-        {
-            if(source == null)
-            {
-                source = HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>();
-            }
-
-            if(destination == null)
-            {
-                destination = GetCurrentAnimator();
-            }
-            
-            var clip =  source.CurrentClip.name;
-            
-            if(clip != currentSourceClip)
-            {
-                currentSourceClip = clip;
-                if (clips.TryGetValue(currentSourceClip, out var dclip)) {
-                    if (CurrentHornet != Hornets.Boss)
-                    {
-                        CurrentHornet = Hornets.Boss;
-                        destination = GetCurrentAnimator();
-                    }
-                    currentDestinationClip = dclip;
-                    destination.Play(currentDestinationClip);
-                } else if (NpcClips.TryGetValue(currentSourceClip, out var dclip2)) {
-                    if (CurrentHornet != Hornets.NPC)
-                    {
-                        CurrentHornet = Hornets.NPC;
-                        destination = GetCurrentAnimator();
-                    }
-                    currentDestinationClip = dclip2;
-                    destination.Play(currentDestinationClip);
-                }
-
-            }
-        }
-
-        private tk2dSpriteAnimator GetCurrentAnimator()
-        {
-            SetCurrentHornet();
-            return current.GetComponent<tk2dSpriteAnimator>();
-        }
     }
 }

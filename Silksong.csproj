@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <VanillaFiles>..\Vanilla</VanillaFiles>
-    <ModdingAPI>..\HollowKnight.Modding\OutputFinal</ModdingAPi>
+    <ModdingAPI>..\HollowKnight.Modding\OutputFinal</ModdingAPI>
     <HollowKnightModsDirectory>..\linkedtoHKMods</HollowKnightModsDirectory>
     <TargetFrameworkProfile />
 
@@ -67,6 +67,9 @@
     <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(VanillaFiles)\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
@@ -74,7 +77,7 @@
       <HintPath>$(VanillaFiles)\PlayMaker.dll</HintPath>
     </Reference>
     <Reference Include="Satchel">
-      <HintPath>$(ModdingAPI)\Mods\Satchel\Satchel.dll</HintPath>
+      <HintPath>$(HollowKnightModsDirectory)\Satchel\Satchel.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(ModdingAPI)\MMHook_Assembly-Csharp.dll</HintPath>
@@ -83,14 +86,21 @@
   
   <ItemGroup>
     <Compile Include="Silksong.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Hornet\Animations.cs" />
+    <Compile Include="Hornet\Sounds.cs" />
+    <Compile Include="Hornet\Hornets.cs" />
+    <Compile Include="Hornet\Controller.cs" />
+
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-  </PropertyGroup>
+  <ItemGroup>
+      <EmbeddedResource Include="Images\*.png" />
+  </ItemGroup>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(HollowKnightModsDirectory)\$(AssemblyName)"/>
-    </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(HollowKnightModsDirectory)\$(AssemblyName)"/>
+  </Target>
 </Project>

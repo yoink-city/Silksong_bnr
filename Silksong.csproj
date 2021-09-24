@@ -86,6 +86,12 @@
   
   <ItemGroup>
     <Compile Include="Silksong.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Hornet\Animations.cs" />
+    <Compile Include="Hornet\Sounds.cs" />
+    <Compile Include="Hornet\Hornets.cs" />
+    <Compile Include="Hornet\Controller.cs" />
+
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   

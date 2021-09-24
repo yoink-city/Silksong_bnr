@@ -6,6 +6,7 @@ using Modding;
 using Satchel;
 using UnityEngine;
 using static Satchel.EnemyUtils;
+using static Satchel.AssemblyUtils;
 using Object = UnityEngine.Object;
 
 namespace Silksong
@@ -162,7 +163,7 @@ namespace Silksong
         {
             if (SilkSongTitle == null)
             {
-                SilkSongTitle = AssemblyUtils.GetSpriteFromResources("SilkSongTitle.png");
+                SilkSongTitle = GetSpriteFromResources("SilkSongTitle.png");
             }
             //In constructor because initialize too late
             On.MenuStyleTitle.SetTitle += FixBanner;
@@ -171,6 +172,17 @@ namespace Silksong
         private void FixBanner(On.MenuStyleTitle.orig_SetTitle orig, MenuStyleTitle self, int index)
         {
             self.Title.sprite = SilkSongTitle;
+            var tcl = GameObject.Find("TeamCherryLogo");
+            var ycl = GameObject.Find("YoinkCityLogo");
+            if(tcl != null && ycl == null){
+                ycl = new GameObject();
+                ycl.name = "YoinkCityLogo";
+                ycl.transform.position = tcl.transform.position + new Vector3(0.75f, 0.2f, 0f);
+                ycl.transform.localScale = new Vector3(0.11f,0.11f,1f);
+                ycl.transform.SetParent(tcl.transform, true);
+                var sr = ycl.GetAddComponent<SpriteRenderer>();
+                sr.sprite = GetSpriteFromResources("YoinkCity.png");
+            }
         }
 
         public override List<(string, string)> GetPreloadNames()

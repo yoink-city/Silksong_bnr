@@ -67,6 +67,9 @@
     <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(VanillaFiles)\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(VanillaFiles)\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
@@ -74,7 +77,7 @@
       <HintPath>$(VanillaFiles)\PlayMaker.dll</HintPath>
     </Reference>
     <Reference Include="Satchel">
-      <HintPath>$(ModdingAPI)\Mods\Satchel\Satchel.dll</HintPath>
+      <HintPath>$(HollowKnightModsDirectory)\Satchel\Satchel.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(ModdingAPI)\MMHook_Assembly-Csharp.dll</HintPath>
@@ -88,7 +91,7 @@
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-      <EmbeddedResource Include="Images\SilkSongTitle.png" />
+      <EmbeddedResource Include="Images\*.png" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

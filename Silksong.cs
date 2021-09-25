@@ -77,6 +77,10 @@ namespace Silksong
             Logger($"LanguageGet title: {sheetTitle}");
             Debug.Log($"[Silksong]:LanguageGet string: {owig}");*/
 
+            if(Dialogue.KeyMap.TryGetValue(key,out var replacement)){
+                return replacement;
+            }
+            // Update Credits
             if (key == "CREDITS_CONGRATS_BODY")
             {
                 owig += "<br> Mod made by Yoink City";
@@ -94,7 +98,7 @@ namespace Silksong
             }
             if (key == "CREDITS_GAME_BY")
             {
-                owig = "A game and mod by";
+                owig = "and mod by YoinkCity, original game by";
                 return owig;
             }
             if (key == "CREDITS_TESTERS_NAME_COL_01")

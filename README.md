@@ -8,5 +8,5 @@
 - Dandy#8904
 - Mulhima#2695
 - Ruttie#3005   
-And playtested by:   
+## And playtested by:   
 - DwarfWoot#0643

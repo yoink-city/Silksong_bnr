@@ -106,6 +106,8 @@ namespace Silksong.Hornet {
             {"Sit Idle","Den Idle R"},
             {"Sit Lean","Den Talk R"},
             {"Sitting Asleep","Den Talk R"},
+            {"Wake To Sit","Den End R"},
+            {"Sit Fall Asleep","Den End R"},
             {"Wake","Den End R"},
             {"Get Off","Den Idle"},
             {"Dash","Harpoon Side"},

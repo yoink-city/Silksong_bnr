@@ -82,6 +82,9 @@
     <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(ModdingAPI)\MMHook_Assembly-Csharp.dll</HintPath>
     </Reference>
+    <Reference Include="MMHOOK_PlayMaker, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(ModdingAPI)\MMHook_PlayMaker.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>

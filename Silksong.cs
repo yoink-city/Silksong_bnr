@@ -62,7 +62,7 @@ namespace Silksong
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
-            Modding.ModHooks.LanguageGetHook += WanguageGet;
+            Modding.ModHooks.LanguageGetHook += LanguageGet;
             BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
             Object.DontDestroyOnLoad(BossPrefab);
@@ -70,46 +70,42 @@ namespace Silksong
             CreateHornetController();
         }
 
-        private string WanguageGet(string key, string sheetTitle, string owig)
+        private string LanguageGet(string key, string sheetTitle, string orig)
         {
-            //This mod has now been claimed by the OwO army
-            Logger($"LanguageGet key: {key}");
-            Logger($"LanguageGet title: {sheetTitle}");
-            Debug.Log($"[Silksong]:LanguageGet string: {owig}");
             if(Dialogue.KeyMap.TryGetValue(key,out var replacement)){
                 return replacement;
             }
             // Update Credits
             if (key == "CREDITS_CONGRATS_BODY")
             {
-                owig += "<br> Mod made by Yoink City";
-                return owig;
+                orig += "<br> Mod made by Yoink City";
+                return orig;
             }
             if (key == "CREDITS_EXTRA_THANKS_TEXT")
             {
-                owig = "2158 Backers, Kickstarter<br> + Dandy, Mulhima & Ruttie for the mod. (^.^)";
-                return owig;
+                orig = "2158 Backers, Kickstarter<br> + Dandy, Mulhima & Ruttie for the mod. (^.^)";
+                return orig;
             }
             if (key == "CREDITS_GAME_BY_NAME")
             {
-                owig += "<br> Dandy, Mulhima & Ruttie";
-                return owig;
+                orig += "<br> Dandy, Mulhima & Ruttie";
+                return orig;
             }
             if (key == "CREDITS_GAME_BY")
             {
-                owig = "and mod by YoinkCity, original game by";
-                return owig;
+                orig = "and mod by YoinkCity, original game by";
+                return orig;
             }
             if (key == "CREDITS_TESTERS_NAME_COL_01")
             {
-                owig += "<br>Mod Tester: ";
+                orig += "<br>Mod Tester: ";
             }
             if (key == "CREDITS_TESTERS_NAME_COL_02")
             {
-                owig += "DwarfWoot";
-                return owig;
+                orig += "DwarfWoot";
+                return orig;
             }
-            return owig;
+            return orig;
         }
 
         public void CreateHornetController(){

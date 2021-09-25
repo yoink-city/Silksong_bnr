@@ -98,6 +98,7 @@ namespace Silksong.Hornet {
             {"DG Warp","Fall"},
             {"DG Warp Cancel","Idle"},
             {"DG Warp In","Fall"},
+            {"Hazard Respawn","Stun"},
         };
         
         public static Dictionary<string, string> NpcClips = new Dictionary<string, string>()

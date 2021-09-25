@@ -33,23 +33,40 @@ namespace Silksong.Hornet {
             StartCoroutine(CreateChangelings(BossPrefab,NpcPrefab));
             ModHooks.HeroUpdateHook += HeroUpdate;
             ModHooks.BeforePlayerDeadHook += BeforePlayerDeadHook;
-            On.HeroController.Start += EditFsm;
+            On.PlayMakerFSM.OnEnable += FsmEdit;
         }
 
         private void BeforePlayerDeadHook(){
             CurrentHornet = Hornets.NPC;
         }
 
-        private void EditFsm(On.HeroController.orig_Start orig, HeroController self)
+        private void FsmEdit(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
+            if (self.FsmName == "Knight Death Control")
+            {
+                self.GetAction<Tk2dPlayAnimation>("Stab", 20).clipName = currentSourceClip;
+                self.GetAction<Tk2dPlayAnimation>("Fling", 0).clipName = currentSourceClip;
+                
+                self.InsertMethod("Stab",() => source.Play("Spike Death Antic"),0);
+                self.InsertMethod("Fling",() => source.Play("Spike Death"),0);
+                
+                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(FixGos()),0);
+            }
+            else if (self.FsmName == "Hero Death Anim")
+            {
+                self.GetAction<Tk2dPlayAnimation>("Start", 0).clipName = currentSourceClip;
+                self.GetAction<SetMeshRenderer>("Start", 1).active = false;
+                self.RemoveAction("Start",2);
+                
+                self.InsertMethod("Start",() => source.Play("Death"),0);
+            }
             orig(self);
-            var fsm = self.transform.Find("Hero Death").gameObject.LocateMyFSM("Hero Death Anim");
-            fsm.RemoveAction("Start",2);
-            fsm.RemoveAction("Start",1);
-            fsm.RemoveAction("Start",0);
-            fsm.InsertMethod( "Start", ()=>{
-                // probably play death here but somehow also handle the clips
-            }, 0);
+        }
+
+        private IEnumerator FixGos()
+        {
+            yield return null;
+            Destroy(GameObject.Find("Knight Spike Death(Clone)"));
         }
         private void HeroUpdate()
         {   

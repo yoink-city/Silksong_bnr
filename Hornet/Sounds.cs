@@ -44,17 +44,17 @@ namespace Silksong.Hornet
                 }
             }
             if(currentSourceClip != null && currentSourceClip.Contains("Slash")){
-                if(roll < 0.01f){
+                if(roll < 0.005f){
                     playAudio("Hornet_Fight_Yell_04", false);
-                } else if(roll < 0.02f) {
+                } else if(roll < 0.010f) {
                     playAudio("Hornet_Fight_Yell_06", false);
-                } else if(roll < 0.03f) {
+                } else if(roll < 0.015f) {
                     playAudio("Hornet_Fight_Yell_08", false);
-                } else if(roll < 0.04f) {
+                } else if(roll < 0.020f) {
                     playAudio("Hornet_Fight_Yell_09", false);
-                } else if(roll < 0.06f){
+                } else if(roll < 0.030f){
                     playAudio("Hornet_Fight_Laugh_01", false);
-                } else if(roll < 0.08f) {
+                } else if(roll < 0.040f) {
                     playAudio("Hornet_Fight_Laugh_02", false);
                 }
             }

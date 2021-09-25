@@ -3,3 +3,4 @@ ref
 obj
 bin
 *.png~
+.vs/

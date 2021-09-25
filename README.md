@@ -1,4 +1,4 @@
-![Logo](https://media.discordapp.net/attachments/890305481485193246/891332875448893480/repository-open-graph-template.png?width=1074&height=537)   
+![Logo](Images/repository-open-graph-template.png)   
 
 [![Discord](https://img.shields.io/discord/879125729936298015.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/VDsg3HmWuB)   
 

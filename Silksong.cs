@@ -73,10 +73,9 @@ namespace Silksong
         private string WanguageGet(string key, string sheetTitle, string owig)
         {
             //This mod has now been claimed by the OwO army
-            /*Logger($"LanguageGet key: {key}");
+            Logger($"LanguageGet key: {key}");
             Logger($"LanguageGet title: {sheetTitle}");
-            Debug.Log($"[Silksong]:LanguageGet string: {owig}");*/
-
+            Debug.Log($"[Silksong]:LanguageGet string: {owig}");
             if(Dialogue.KeyMap.TryGetValue(key,out var replacement)){
                 return replacement;
             }

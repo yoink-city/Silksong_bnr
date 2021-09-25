@@ -58,7 +58,7 @@ namespace Silksong.Hornet {
             ChangeToHornet();
             ImitateClips();
 
-            if(Input.GetKeyDown(KeyCode.Space)){
+            if(Input.GetKeyDown(KeyCode.K)){
                 HeroController.instance.gameObject.logTk2dAnimationClips();
                 BossGo.logTk2dAnimationClips();
                 NpcGo.logTk2dAnimationClips();
@@ -77,15 +77,12 @@ namespace Silksong.Hornet {
         
         private void SetCurrentHornet()
         {
-
-
             if(CurrentHornet == Hornets.Boss){
                 current = BossGo;
             }
             if(CurrentHornet == Hornets.NPC){
                 current = NpcGo;
             }
-            
             
             DisableOtherHornets();
             current.GetComponent<MeshRenderer>().enabled = true;
@@ -119,7 +116,6 @@ namespace Silksong.Hornet {
                 }
             }
 
-            
             if(destination == null)
             {
                 destination = GetCurrentAnimator();
@@ -130,7 +126,6 @@ namespace Silksong.Hornet {
 
             var clip = source.CurrentClip.name;
             
-
             if(clip != currentSourceClip)
             {
                 currentSourceClip = clip;
@@ -166,6 +161,5 @@ namespace Silksong.Hornet {
             SetCurrentHornet();
             return current.GetComponent<tk2dSpriteAnimator>();
         }
-
     }
 }

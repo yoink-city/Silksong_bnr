@@ -9,6 +9,7 @@ using static Satchel.EnemyUtils;
 using static Satchel.AssemblyUtils;
 using Object = UnityEngine.Object;
 using Silksong.Hornet;
+using UnityEngine.SceneManagement;
 
 namespace Silksong
 {
@@ -21,7 +22,7 @@ namespace Silksong
         public static Controller ControllerScript;
         private static Sprite SilkSongTitle;
             
-        public override string GetVersion() => "v0.3.0 - 0";
+        public override string GetVersion() => "v0.3.0 - 1";
         public new string GetName() => "Silksong (but not really)";
 
         public Silksong()
@@ -61,11 +62,42 @@ namespace Silksong
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
+            Modding.ModHooks.LanguageGetHook += WanguageGet;
             BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
             Object.DontDestroyOnLoad(BossPrefab);
             Object.DontDestroyOnLoad(NpcPrefab);
             CreateHornetController();
+        }
+
+        private string WanguageGet(string key, string sheetTitle, string owig)
+        {
+            //This mod has now been claimed by the OwO army
+            /*Logger($"LanguageGet key: {key}");
+            Logger($"LanguageGet title: {sheetTitle}");
+            Debug.Log($"[Silksong]:LanguageGet string: {owig}");*/
+
+            if (key == "CREDITS_CONGRATS_BODY")
+            {
+                owig += "<br> Mod made by Yoink City";
+                return owig;
+            }
+            if (key == "CREDITS_EXTRA_THANKS_TEXT")
+            {
+                owig = "2158 Backers, Kickstarter<br> + Dandy, Mulhima & Ruttie for the mod. (^.^)";
+                return owig;
+            }
+            if (key == "CREDITS_GAME_BY_NAME")
+            {
+                owig += "<br> Dandy, Mulhima & Ruttie";
+                return owig;
+            }
+            if (key == "CREDITS_GAME_BY")
+            {
+                owig = "A game and mod by";
+                return owig;
+            }
+            return owig;
         }
 
         public void CreateHornetController(){
@@ -77,5 +109,11 @@ namespace Silksong
             Object.DontDestroyOnLoad(ControllerGo);
         }
         
+        private void Logger(string text)
+        {
+            Modding.Logger.Log($":[Silksong]:{text}");
+            Debug.Log($"[Silksong]:{text}");
+        }
+
     }
 }

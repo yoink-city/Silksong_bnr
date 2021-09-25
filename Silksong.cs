@@ -97,6 +97,15 @@ namespace Silksong
                 owig = "A game and mod by";
                 return owig;
             }
+            if (key == "CREDITS_TESTERS_NAME_COL_01")
+            {
+                owig += "<br>Mod Tester: ";
+            }
+            if (key == "CREDITS_TESTERS_NAME_COL_02")
+            {
+                owig += "DwarfWoot";
+                return owig;
+            }
             return owig;
         }
 

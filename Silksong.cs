@@ -66,10 +66,7 @@ namespace Silksong
             };   
         }
 
-        private IEnumerator CreateCustomDialogueManager(){
-            yield return new WaitWhile(() => {
-                return HeroController.instance == null || HeroController.instance.gameObject == null;
-            });
+        private void CreateCustomDialogueManager(){
             if(customDialogueManager == null){
                 customDialogueManager = satchel.GetCustomDialogueManager(CardPrefab);
                 Dialogue.AddCustomDialogue(customDialogueManager);
@@ -86,7 +83,7 @@ namespace Silksong
             Object.DontDestroyOnLoad(NpcPrefab);
             Object.DontDestroyOnLoad(CardPrefab);
             CreateHornetController();
-            GameManager.instance.StartCoroutine(CreateCustomDialogueManager());
+            CreateCustomDialogueManager();
         }
 
         private string LanguageGet(string key, string sheetTitle, string orig)

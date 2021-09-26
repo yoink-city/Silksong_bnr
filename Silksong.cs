@@ -17,7 +17,7 @@ namespace Silksong
     {
 
         internal static Silksong Instance;
-        public static GameObject BossPrefab,NpcPrefab,ControllerGo;
+        public static GameObject BossPrefab,NpcPrefab,CardPrefab,ControllerGo;
 
         public static Controller ControllerScript;
         private static Sprite SilkSongTitle;
@@ -55,9 +55,11 @@ namespace Silksong
             return new List<(string, string)>
             {
                 ("GG_Hornet_2", "Boss Holder/Hornet Boss 2"),
-                ("Deepnest_Spider_Town", "Hornet Beast Den NPC")
+                ("Deepnest_Spider_Town", "Hornet Beast Den NPC"),
+                ("Cliffs_01","Cornifer Card")
             };   
         }
+
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
@@ -65,8 +67,10 @@ namespace Silksong
             Modding.ModHooks.LanguageGetHook += LanguageGet;
             BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
+            CardPrefab = preloadedObjects["Cliffs_01"]["Cornifer Card"];
             Object.DontDestroyOnLoad(BossPrefab);
             Object.DontDestroyOnLoad(NpcPrefab);
+            Object.DontDestroyOnLoad(CardPrefab);
             CreateHornetController();
         }
 

@@ -7,6 +7,7 @@ using Satchel;
 using static Silksong.Helpers;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using static Modding.Logger;
 
 namespace Silksong.Hornet {
     public class Controller : MonoBehaviour
@@ -78,6 +79,7 @@ namespace Silksong.Hornet {
             yield return null;
             Destroy(GameObject.Find("Knight Spike Death(Clone)"));
         }
+
         private void HeroUpdate()
         {   
             

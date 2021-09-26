@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using Modding;
 using Satchel;
@@ -10,14 +11,18 @@ using static Satchel.AssemblyUtils;
 using Object = UnityEngine.Object;
 using Silksong.Hornet;
 using UnityEngine.SceneManagement;
-
+using static Silksong.Helpers;
 namespace Silksong
 {
     public class Silksong : Mod
     {
 
         internal static Silksong Instance;
-        public static GameObject BossPrefab,NpcPrefab,ControllerGo;
+
+        public static Satchel.Core satchel;
+        public CustomDialogueManager customDialogueManager;
+
+        public static GameObject BossPrefab,NpcPrefab,CardPrefab,ControllerGo;
 
         public static Controller ControllerScript;
         private static Sprite SilkSongTitle;
@@ -31,6 +36,7 @@ namespace Silksong
             {
                 SilkSongTitle = GetSpriteFromResources("SilkSongTitle.png");
             }
+            satchel = new Satchel.Core();
             //In constructor because initialize too late
             On.MenuStyleTitle.SetTitle += FixBanner;
         }
@@ -40,13 +46,7 @@ namespace Silksong
             var tcl = GameObject.Find("TeamCherryLogo");
             var ycl = GameObject.Find("YoinkCityLogo");
             if(tcl != null && ycl == null){
-                ycl = new GameObject();
-                ycl.name = "YoinkCityLogo";
-                ycl.transform.position = tcl.transform.position + new Vector3(0.75f, 0.2f, 0f);
-                ycl.transform.localScale = new Vector3(0.11f,0.11f,1f);
-                ycl.transform.SetParent(tcl.transform, true);
-                var sr = ycl.GetAddComponent<SpriteRenderer>();
-                sr.sprite = GetSpriteFromResources("YoinkCity.png");
+                ycl = CreateYoinkCityLogo(tcl);
             }
         }
 
@@ -55,19 +55,46 @@ namespace Silksong
             return new List<(string, string)>
             {
                 ("GG_Hornet_2", "Boss Holder/Hornet Boss 2"),
-                ("Deepnest_Spider_Town", "Hornet Beast Den NPC")
+                ("Deepnest_Spider_Town", "Hornet Beast Den NPC"),
+                ("Cliffs_01","Cornifer Card")
             };   
         }
 
+        private void CreateCustomDialogueManager(){
+            if(customDialogueManager == null){
+                customDialogueManager = satchel.GetCustomDialogueManager(CardPrefab);
+                Dialogue.AddCustomDialogue(customDialogueManager);
+            }
+        }
+
+        public void SceneChange(Scene scene,LoadSceneMode mode){
+            Log(scene.name);
+            if(scene.name == "Town"){
+                CreateCard(CardPrefab,new Vector3(190f,7.3f,0)).GetAddCustomArrowPrompt(()=>{
+                    customDialogueManager.ShowDialogue(Dialogue.hornetConversationKey);
+                });
+            } else if(scene.name == "Fungus1_04"){
+                CreateCard(CardPrefab,new Vector3(10f,27.5f,0)).GetAddCustomArrowPrompt(()=>{
+                    customDialogueManager.ShowDialogue(Dialogue.hornetAfterYoungKey);
+                });
+            }
+        }
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
-            Modding.ModHooks.LanguageGetHook += LanguageGet;
             BossPrefab = preloadedObjects["GG_Hornet_2"]["Boss Holder/Hornet Boss 2"];
             NpcPrefab = preloadedObjects["Deepnest_Spider_Town"]["Hornet Beast Den NPC"];
+            CardPrefab = preloadedObjects["Cliffs_01"]["Cornifer Card"];
             Object.DontDestroyOnLoad(BossPrefab);
             Object.DontDestroyOnLoad(NpcPrefab);
+            Object.DontDestroyOnLoad(CardPrefab);
             CreateHornetController();
+            CreateCustomDialogueManager();
+            CustomArrowPrompt.Prepare(CardPrefab);
+
+            Modding.ModHooks.LanguageGetHook += LanguageGet;
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneChange;
+
         }
 
         private string LanguageGet(string key, string sheetTitle, string orig)

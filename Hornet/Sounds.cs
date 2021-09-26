@@ -36,25 +36,26 @@ namespace Silksong.Hornet
                     playAudio("Hornet_Fight_Laugh_02", false);
                 }
             }
-            if(currentDestinationClip == "Land"){
-                if(roll < 0.1f){
-                    playAudio("Hornet_Fight_Laugh_01", false);
-                } else if(roll < 0.2f) {
-                    playAudio("Hornet_Fight_Laugh_02", false);
-                }
-            }
-            if(currentSourceClip != null && currentSourceClip.Contains("Slash")){
-                if(roll < 0.01f){
+
+            if(currentSourceClip != null && ( currentSourceClip.Contains("NA Big Slash") || currentSourceClip.Contains("NA Dash Slash")  || currentSourceClip.Contains("NA Cyclone") )){
+                if(roll < 0.25f){
                     playAudio("Hornet_Fight_Yell_04", false);
-                } else if(roll < 0.02f) {
+                } else if(roll < 0.50f) {
                     playAudio("Hornet_Fight_Yell_06", false);
-                } else if(roll < 0.03f) {
+                } else if(roll < 0.75f) {
                     playAudio("Hornet_Fight_Yell_08", false);
-                } else if(roll < 0.04f) {
+                } else if(roll <= 1f) {
                     playAudio("Hornet_Fight_Yell_09", false);
-                } else if(roll < 0.06f){
+                } 
+            }
+        }
+
+        public static void SlashHit(Collider2D otherCollider, GameObject gameObject){
+            if(otherCollider.gameObject.layer == 11 && !HeroController.instance.cState.onGround){
+                var roll = UnityEngine.Random.Range(0.0f, 1.0f);
+                if(roll < 0.2f){
                     playAudio("Hornet_Fight_Laugh_01", false);
-                } else if(roll < 0.08f) {
+                } else if(roll < 0.4f) {
                     playAudio("Hornet_Fight_Laugh_02", false);
                 }
             }

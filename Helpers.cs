@@ -12,6 +12,7 @@ namespace Silksong
         {
             var hero = HeroController.instance.gameObject;
             var changed = go.createCompanionFromPrefab();
+            while(changed.RemoveComponent<Collider2D>()){};
             changed.name = name;
             changed.layer = hero.layer;
             changed.SetActive(true);

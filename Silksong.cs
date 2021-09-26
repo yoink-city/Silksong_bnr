@@ -22,7 +22,7 @@ namespace Silksong
         public static Controller ControllerScript;
         private static Sprite SilkSongTitle;
             
-        public override string GetVersion() => "v0.3.0 - 1";
+        public override string GetVersion() => "v0.4.0 - 1";
         public new string GetName() => "Silksong (but not really)";
 
         public Silksong()

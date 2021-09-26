@@ -99,6 +99,22 @@ namespace Silksong.Hornet {
             {"DG Warp Cancel","Idle"},
             {"DG Warp In","Fall"},
             {"Hazard Respawn","Stun"},
+            {"ToProne","Stun"},
+            {"Collect SD 4","Stun"},
+            {"Wake Up Ground","Stun"},
+            {"Respawn Wake","Stun"},
+            {"TurnToIdle","Idle"},
+            {"LookUpEnd","Idle"},
+            {"LookDownEnd","Idle"},
+            {"LookUpToIdle","Idle"},
+            {"GetUpToIdle","Idle"},
+            {"LookUp","Idle"},
+            {"Dash To Idle","Idle"},
+            {"Collect StandToIdle","Idle"},
+            {"LookDownToIdle","Idle"},
+            {"LookDown","Idle"},
+            {"Collect Magical 3b", "Sphere Antic A"}
+
         };
         
         public static Dictionary<string, string> NpcClips = new Dictionary<string, string>()

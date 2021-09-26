@@ -61,7 +61,7 @@ namespace Silksong.Hornet {
                 self.InsertMethod("Stab",() => source.Play("Spike Death Antic"),0);
                 self.InsertMethod("Fling",() => source.Play("Spike Death"),0);
                 
-                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(FixGos()),0);
+                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(DestroyGo("Knight Spike Death(Clone)")),0);
             }
             else if (self.FsmName == "Hero Death Anim")
             {
@@ -71,13 +71,38 @@ namespace Silksong.Hornet {
                 
                 self.InsertMethod("Start",() => source.Play("Death"),0);
             }
+            else if (self.FsmName == "Get Fireball")
+            {
+                self.InsertMethod("Rumble",() => source.Play("Collect Magical 2"),0);
+                self.InsertMethod("Start", () => GameManager.instance.StartCoroutine(MakeGoInvisible("Knight Cutscene Animator")),0);
+            }
+            else if (self.FsmName == "Get Scream")
+            {
+                self.InsertMethod("Rumble",() => source.Play("Collect Magical 2"),0);
+                self.InsertMethod("Start", () => GameManager.instance.StartCoroutine(MakeGoInvisible("Knight Cutscene Animator")),0);
+            }
+            else if (self.FsmName == "Get Quake")
+            {
+                self.InsertMethod("Rumble",() => source.Play("Collect Magical 2"),0);
+                self.InsertMethod("Start", () => GameManager.instance.StartCoroutine(MakeGoInvisible("Knight Cutscene Animator")),0);
+            }
+            else if (self.FsmName == "Knight Acid Death")
+            {
+                self.InsertMethod("Start", () => GameManager.instance.StartCoroutine(DestroyGo("Knight Acid Death(Clone)")),0);
+            }
             orig(self);
         }
 
-        private IEnumerator FixGos()
+        private IEnumerator DestroyGo(string WhatToKill)
         {
             yield return null;
-            Destroy(GameObject.Find("Knight Spike Death(Clone)"));
+            Destroy(GameObject.Find(WhatToKill));
+        }
+        
+        private IEnumerator MakeGoInvisible(string WhatToMakeInvis)
+        {
+            yield return null;
+            GameObject.Find(WhatToMakeInvis).GetComponent<MeshRenderer>().enabled = false;
         }
 
         private void HeroUpdate()

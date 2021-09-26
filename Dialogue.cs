@@ -8,9 +8,12 @@ using Satchel;
 namespace Silksong
 {
     public class Dialogue{
-        public static string hornetConversationKey = "HornetCustom";
+        public static string hornetConversationKey = "HornetBeforeWell";
+        public static string hornetAfterYoungKey = "HornetAfterYoung";
+
         public static void AddCustomDialogue(CustomDialogueManager cdm){
-            cdm.AddConversation(hornetConversationKey,"Hello I am hornet<page>I am a void hornet<page>boom boom time travel");
+            cdm.AddConversation(hornetConversationKey,"Did I make the right choice? Coming back...<page>Opening it took almost all my strength, that gate made of void and dreams<page>But with that, I now have a chance... this world can survive... It has to...");
+            cdm.AddConversation(hornetAfterYoungKey,"I was such a fool, believing my actions to be noble<page>If only I had aided the vessel earlier, perhaps things would be different?<page>No matter, I will correct my mistakes.");
             cdm.OnEndPage((string conversation,int currentPage)=>{
                 if(hornetConversationKey != conversation) { return; }
                 //Log(conversation+":"+currentPage);

@@ -35,6 +35,7 @@ namespace Silksong.Hornet {
             StartCoroutine(CreateChangelings(BossPrefab,NpcPrefab));
             ModHooks.HeroUpdateHook += HeroUpdate;
             ModHooks.BeforePlayerDeadHook += BeforePlayerDeadHook;
+            ModHooks.SlashHitHook += Sounds.SlashHit;
             On.PlayMakerFSM.OnEnable += FsmEdit;
         }
 

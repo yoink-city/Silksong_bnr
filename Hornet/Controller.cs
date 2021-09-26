@@ -12,27 +12,34 @@ namespace Silksong.Hornet {
     public class Controller : MonoBehaviour
     {
         public GameObject current;
+        private GameObject BossPrefab, NpcPrefab;
+
         private GameObject BossGo, NpcGo;
         private string currentSourceClip,currentDestinationClip;
         private tk2dSpriteAnimator source,destination; 
         private Hornets CurrentHornet = Hornets.NPC;
         private bool initialised = false;
 
-        private IEnumerator CreateChangelings(GameObject BossPrefab,GameObject NpcPrefab){
+        private IEnumerator CreateChangelings(){
             yield return new WaitWhile(() => {
                 return HeroController.instance == null || HeroController.instance.gameObject == null;
             });
-            BossGo = CreateChangeling(BossPrefab,"h0rnetB");
-            NpcGo = CreateChangeling(NpcPrefab,"h0rnetN");
+            if(BossGo == null){
+                BossGo = CreateChangeling(BossPrefab,"h0rnetB");
+            }
+            if(NpcGo == null){
+                NpcGo = CreateChangeling(NpcPrefab,"h0rnetN");
+            }
         }
         public void Init(GameObject BossPrefab,GameObject NpcPrefab){
             if(initialised) { return; }
             initialised = true;
-
+            this.BossPrefab = BossPrefab;
+            this.NpcPrefab = NpcPrefab;
             if(Sounds.AudioClips == null){
                 Sounds.AudioClips = BossPrefab.GetComponent<PlayMakerFSM>().getAudioClips();
             }
-            StartCoroutine(CreateChangelings(BossPrefab,NpcPrefab));
+            StartCoroutine(CreateChangelings());
             ModHooks.HeroUpdateHook += HeroUpdate;
             ModHooks.BeforePlayerDeadHook += BeforePlayerDeadHook;
             ModHooks.SlashHitHook += Sounds.SlashHit;
@@ -97,6 +104,12 @@ namespace Silksong.Hornet {
         
         private void SetCurrentHornet()
         {
+            if(BossGo == null){
+                BossGo = CreateChangeling(BossPrefab,"h0rnetB");
+            }
+            if(NpcGo == null){
+                NpcGo = CreateChangeling(NpcPrefab,"h0rnetN");
+            }
             if(CurrentHornet == Hornets.Boss){
                 current = BossGo;
             }

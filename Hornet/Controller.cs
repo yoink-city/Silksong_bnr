@@ -44,39 +44,10 @@ namespace Silksong.Hornet {
             ModHooks.BeforePlayerDeadHook += BeforePlayerDeadHook;
             ModHooks.SlashHitHook += Sounds.SlashHit;
             On.PlayMakerFSM.OnEnable += FsmEdit;
-            On.HeroController.DieFromHazard += FixHazardAndAcidDeath;
         }
 
         private void BeforePlayerDeadHook(){
             CurrentHornet = Hornets.NPC;
-        }
-
-        private IEnumerator FixHazardAndAcidDeath(On.HeroController.orig_DieFromHazard orig, HeroController self,
-            HazardType hazardtype, float angle)
-        {
-            HeroController heroController = self;
-            if (!heroController.cState.hazardDeath)
-            {
-                heroController.playerData.disablePause = true;
-                typeof(HeroController).GetMethod("StopTilemapTest", BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.Invoke(self, new object[] {});
-                typeof(HeroController).GetMethod("SetState", BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.Invoke(self, new object[] {ActorStates.no_input});
-                heroController.cState.hazardDeath = true;
-                
-                
-                typeof(HeroController).GetMethod("ResetMotion", BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.Invoke(self, new object[] {});
-                
-                heroController.ResetHardLandingTimer();
-                heroController.AffectedByGravity(false);
-
-                ReflectionHelper.GetField<HeroController, MeshRenderer>(self, "renderer").enabled = false;
-                heroController.gameObject.layer = 2;
-                yield return (object) null;
-                heroController.StartCoroutine(GameManager.instance.PlayerDeadFromHazard(0.0f));
-
-            }
         }
 
         private void FsmEdit(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
@@ -85,22 +56,28 @@ namespace Silksong.Hornet {
             {
                 self.GetAction<Tk2dPlayAnimation>("Stab", 20).clipName = currentSourceClip;
                 self.GetAction<Tk2dPlayAnimation>("Fling", 0).clipName = currentSourceClip;
-
-                self.InsertMethod("Stab", () => source.Play("Spike Death Antic"), 0);
-                self.InsertMethod("Fling", () => source.Play("Spike Death"), 0);
+                
+                self.InsertMethod("Stab",() => source.Play("Spike Death Antic"),0);
+                self.InsertMethod("Fling",() => source.Play("Spike Death"),0);
+                
+                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(FixGos()),0);
             }
             else if (self.FsmName == "Hero Death Anim")
             {
                 self.GetAction<Tk2dPlayAnimation>("Start", 0).clipName = currentSourceClip;
                 self.GetAction<SetMeshRenderer>("Start", 1).active = false;
-                self.RemoveAction("Start", 2);
-
-                self.InsertMethod("Start", () => source.Play("Death"), 0);
+                self.RemoveAction("Start",2);
+                
+                self.InsertMethod("Start",() => source.Play("Death"),0);
             }
-
             orig(self);
         }
-        
+
+        private IEnumerator FixGos()
+        {
+            yield return null;
+            Destroy(GameObject.Find("Knight Spike Death(Clone)"));
+        }
         private void HeroUpdate()
         {   
             

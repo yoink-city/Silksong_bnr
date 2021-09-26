@@ -5,6 +5,8 @@ using Modding;
 using UnityEngine;
 using Satchel;
 using static Silksong.Helpers;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 
 namespace Silksong.Hornet {
     public class Controller : MonoBehaviour

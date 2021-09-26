@@ -88,7 +88,7 @@ namespace Silksong.Hornet {
             ImitateClips();
 
             if(Input.GetKeyDown(KeyCode.K)){
-                Silksong.Instance.customDialogueManager.ShowDialogue("HornetCustom");
+                Silksong.Instance.customDialogueManager.ShowDialogue(Dialogue.hornetConversationKey);
                 //HeroController.instance.gameObject.logTk2dAnimationClips();
                 //BossGo.logTk2dAnimationClips();
                 //NpcGo.logTk2dAnimationClips();

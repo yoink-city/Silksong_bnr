@@ -8,8 +8,8 @@ using Satchel;
 namespace Silksong
 {
     public class Dialogue{
+        public static string hornetConversationKey = "HornetCustom";
         public static void AddCustomDialogue(CustomDialogueManager cdm){
-             var hornetConversationKey = "HornetCustom";
             cdm.AddConversation(hornetConversationKey,"Hello I am hornet<page>I am a void hornet<page>boom boom time travel");
             cdm.OnEndPage((string conversation,int currentPage)=>{
                 if(hornetConversationKey != conversation) { return; }

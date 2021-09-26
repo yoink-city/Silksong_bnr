@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using Modding;
 using Satchel;
@@ -17,6 +18,10 @@ namespace Silksong
     {
 
         internal static Silksong Instance;
+
+        public static Satchel.Core satchel;
+        public CustomDialogueManager customDialogueManager;
+
         public static GameObject BossPrefab,NpcPrefab,CardPrefab,ControllerGo;
 
         public static Controller ControllerScript;
@@ -31,6 +36,7 @@ namespace Silksong
             {
                 SilkSongTitle = GetSpriteFromResources("SilkSongTitle.png");
             }
+            satchel = new Satchel.Core();
             //In constructor because initialize too late
             On.MenuStyleTitle.SetTitle += FixBanner;
         }
@@ -60,7 +66,15 @@ namespace Silksong
             };   
         }
 
-
+        private IEnumerator CreateCustomDialogueManager(){
+            yield return new WaitWhile(() => {
+                return HeroController.instance == null || HeroController.instance.gameObject == null;
+            });
+            if(customDialogueManager == null){
+                customDialogueManager = satchel.GetCustomDialogueManager(CardPrefab);
+                Dialogue.AddCustomDialogue(customDialogueManager);
+            }
+        }
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
@@ -72,6 +86,7 @@ namespace Silksong
             Object.DontDestroyOnLoad(NpcPrefab);
             Object.DontDestroyOnLoad(CardPrefab);
             CreateHornetController();
+            GameManager.instance.StartCoroutine(CreateCustomDialogueManager());
         }
 
         private string LanguageGet(string key, string sheetTitle, string orig)
@@ -111,6 +126,8 @@ namespace Silksong
             }
             return orig;
         }
+
+        
 
         public void CreateHornetController(){
             ControllerGo = new GameObject();

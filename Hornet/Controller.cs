@@ -7,6 +7,7 @@ using Satchel;
 using static Silksong.Helpers;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using static Modding.Logger;
 
 namespace Silksong.Hornet {
     public class Controller : MonoBehaviour
@@ -79,7 +80,6 @@ namespace Silksong.Hornet {
             Destroy(GameObject.Find("Knight Spike Death(Clone)"));
         }
 
-        public CustomDialogue cdc;
         private void HeroUpdate()
         {   
             
@@ -88,12 +88,7 @@ namespace Silksong.Hornet {
             ImitateClips();
 
             if(Input.GetKeyDown(KeyCode.K)){
-                if(cdc == null ){
-                    var cd = Silksong.CardPrefab.createCustomDialogFromPrefab();
-                    cd.SetActive(true);
-                    cdc = cd.GetComponent<CustomDialogue>();
-                }
-                cdc.ShowDialogue("Hello<page>hi<page>wassup");
+                Silksong.Instance.customDialogueManager.ShowDialogue("HornetCustom");
                 //HeroController.instance.gameObject.logTk2dAnimationClips();
                 //BossGo.logTk2dAnimationClips();
                 //NpcGo.logTk2dAnimationClips();

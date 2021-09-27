@@ -11,7 +11,7 @@ namespace Silksong
     public class Helpers{
 
         public static GameObject CreateCard(GameObject CardPrefab,Vector3 position){
-            var card = CardPrefab.createCompanionFromPrefab();
+            var card = CardPrefab.createCompanionFromPrefab(true);
             card.name = "SilksongCard";
             card.layer = 13;
             card.transform.position = position;

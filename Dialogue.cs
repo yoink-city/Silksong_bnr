@@ -24,7 +24,7 @@ namespace Silksong
             });
         }
         public static Dictionary<string,string> KeyMap = new Dictionary<string,string>(){
-            {$"HORNET_GREENPATH",$"Come no closer, imposter.<page>I've seen you, creeping through the undergrowth, stalking me.<page>Return back to your nest... And await the fools that will fall for your deciet...<page>I know what you are. I know what you try to do. But i am no prey."},
+            {$"HORNET_GREENPATH",$"Come no closer, imposter.<page>I've seen you, creeping through the undergrowth, stalking me.<page>Return back to your nest... And await the fools that will fall for your deciet...<page>I know what you are. I know what you try to do. But I am no prey."},
             {$"HORNET_FOUNTAIN_1",$"Again we meet, imposter.<page>I'm normally quite perceptive. You I do not understand, though I've since sensed part of the truth.<page>You're from beyond this kingdom's bounds. Yours is a resilience born of adversity.<page>It's no surprise then that you've managed to reach the heart of this world. But you now know the sacrifice that keeps it standing."},
             {$"HORNET_FOUNTAIN_2",$"It's also best you know that Hallownest does not require outsiders to meddle with it's affairs, I for one shall not allow it, cease this path at once."},
             {$"HORNET_OUTSKIRTS_1",$"So you still continue to pursue the deeper truth? It is neither one for outsiders, nor something the weak could bear."},

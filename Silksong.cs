@@ -80,11 +80,6 @@ namespace Silksong
                 CreateCard(CardPrefab,new Vector3(190f,7.3f,0)).GetAddCustomArrowPrompt(()=>{
                     customDialogueManager.ShowDialogue(Dialogue.hornetConversationKey);
                 });
-                if(!Silksong.settings.HasKonpanion){
-                    CreateKonpanionCard(CardPrefab,new Vector3(193f,7.3f,0)).GetAddCustomArrowPrompt(()=>{
-                        customDialogueManager.ShowDialogue(Dialogue.findKonpanionConversationKey);
-                    });
-                }
             } else if(scene.name == "Fungus1_04"){
                 CreateCard(CardPrefab,new Vector3(10f,27.5f,0)).GetAddCustomArrowPrompt(()=>{
                     customDialogueManager.ShowDialogue(Dialogue.hornetAfterYoungKey);

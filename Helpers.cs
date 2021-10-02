@@ -5,19 +5,12 @@ using Modding;
 using UnityEngine;
 using Satchel;
 using static Satchel.AssemblyUtils;
-using Silksong.Konpanion;
 
 namespace Silksong
 {
     public class Helpers{
 
-        public static Sprite konpanioncard,hornetcard;
-        public static GameObject CreateKonpanionCard(GameObject CardPrefab,Vector3 position){
-            if(konpanioncard == null){
-                konpanioncard = GetSpriteFromResources("konpanioncard.png",128f);
-            }
-            return CreateCardCustom(CardPrefab, position , konpanioncard);
-        }
+        public static Sprite hornetcard;
         public static GameObject CreateCard(GameObject CardPrefab,Vector3 position){
             if(hornetcard == null){
                 hornetcard = GetSpriteFromResources("hornetcard.png",128f);
@@ -46,48 +39,6 @@ namespace Silksong
             changed.transform.position = hero.transform.position + new Vector3(0f, 0f, 0.001f);
             changed.transform.SetParent(hero.transform, true);
             return changed;
-        }
-
-        public static GameObject createKnightCompanion(GameObject ft = null){
-            HeroController.instance.gameObject.SetActive(false);
-            var knight = HeroController.instance.gameObject.createCompanionFromPrefab();
-            HeroController.instance.gameObject.SetActive(true);
-            knight.RemoveComponent<HeroController>();
-            knight.RemoveComponent<HeroAnimationController>();
-            knight.RemoveComponent<HeroAudioController>();
-            knight.RemoveComponent<ConveyorMovementHero>();
-
-            knight.name = "konpanion";
-            knight.GetAddComponent<MeshRenderer>().enabled = true;
-            knight.GetAddComponent<Rigidbody2D>().gravityScale = 1f;
-
-            //add control and adjust parameters
-            var kc = knight.GetAddComponent<KonpanionController>();
-            kc.moveSpeed = 10f;
-            kc.followDistance = 2f;
-            kc.IdleShuffleDistance = 0.01f;
-
-            if(ft != null){
-                kc.followTarget = ft;
-            }
-
-            //fix up collider size
-            var collider = knight.GetAddComponent<BoxCollider2D>();
-            collider.size = new Vector2(1f,2.0f);
-            collider.offset = new Vector2(0f,-0.4f);
-            collider.enabled = true;
-
-            // add animations
-            kc.Animations.Add(State.Idle,"Idle");
-            kc.Animations.Add(State.IdleFidget1,"Acid Death");
-            kc.Animations.Add(State.IdleFidget2,"Prostrate");
-            kc.Animations.Add(State.Walk,"Run");
-            kc.Animations.Add(State.Turn,"Map Walk");
-            kc.Animations.Add(State.Teleport,"Fall");
-            kc.Animations.Add(State.Jump,"Airborne");
-
-            knight.SetActive(true);
-            return knight;
         }
 
         public static GameObject CreateYoinkCityLogo(GameObject tcl){

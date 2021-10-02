@@ -18,9 +18,6 @@ namespace Silksong
 
             cdm.OnEndPage((string conversation,int currentPage)=>{
                 //Log(conversation+":"+currentPage);
-                if(findKonpanionConversationKey == conversation){
-                    Silksong.settings.HasKonpanion = true;
-                }
             });
             cdm.OnEndConversation((string conversation)=>{
                 if(hornetConversationKey != conversation) { return; }

@@ -102,7 +102,6 @@
     <Compile Include="Hornet\Sounds.cs" />
     <Compile Include="Hornet\Hornets.cs" />
     <Compile Include="Hornet\Controller.cs" />
-    <Compile Include="Konpanion\Controller.cs" />
     <Compile Include="Options\Menu.cs" />
     <Compile Include="Options\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

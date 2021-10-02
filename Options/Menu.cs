@@ -49,24 +49,6 @@ namespace Silksong
                         Anchor = TextAnchor.MiddleCenter
                     });  
 
-            area.AddHorizontalOption(
-                    "Konpanion",
-                    new HorizontalOptionConfig
-                    {
-                        Options = new string[] { "Enabled" , "Disabled"},
-                        ApplySetting = (_, i) => Silksong.settings.enableKonpanion = (i == 0),
-                        RefreshSetting = (s, _) => s.optionList.SetOptionTo(Silksong.settings.enableKonpanion ? 0 : 1),
-                        CancelAction = _ => { BackSetting(); },
-                        Description = new DescriptionInfo
-                        {
-                            Text = "A mini knight that follows you",
-                            Style = DescriptionStyle.HorizOptionSingleLineVanillaStyle
-                        },
-                        Label = "Konpanion",
-                        Style = HorizontalOptionStyle.VanillaStyle
-                    },
-                    out var KonpanionSelector
-                ); 
             
             area.AddMenuButton(
                         "DiscordButton",

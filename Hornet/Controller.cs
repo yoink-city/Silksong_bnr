@@ -105,23 +105,12 @@ namespace Silksong.Hornet {
             GameObject.Find(WhatToMakeInvis).GetComponent<MeshRenderer>().enabled = false;
         }
 
-        private void HandleKonpanion(){
-
-            if((Silksong.settings.HasKonpanion && Silksong.settings.enableKonpanion) && Konpanion == null){
-                Konpanion = Helpers.createKnightCompanion();
-            }
-            if(!(Silksong.settings.HasKonpanion && Silksong.settings.enableKonpanion) && Konpanion != null){
-                Destroy(Konpanion);
-            }
-        }
-
         private void HeroUpdate()
         {   
             
             HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             ChangeToHornet();
             ImitateClips();
-            HandleKonpanion();
             /*if(Input.GetKeyDown(KeyCode.K)){
                 HeroController.instance.gameObject.logTk2dAnimationClips();
                 BossGo.logTk2dAnimationClips();

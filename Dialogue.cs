@@ -17,11 +17,9 @@ namespace Silksong
             cdm.AddConversation(findKonpanionConversationKey,"Oh? Another vessel that tries?<page>If you wish to accompany me, I wont stop you.");
 
             cdm.OnEndPage((string conversation,int currentPage)=>{
-                //Log(conversation+":"+currentPage);
             });
             cdm.OnEndConversation((string conversation)=>{
                 if(hornetConversationKey != conversation) { return; }
-                //Log(conversation);
             });
         }
         public static Dictionary<string,string> KeyMap = new Dictionary<string,string>(){

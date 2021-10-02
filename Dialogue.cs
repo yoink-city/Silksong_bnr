@@ -10,13 +10,17 @@ namespace Silksong
     public class Dialogue{
         public static string hornetConversationKey = "HornetBeforeWell";
         public static string hornetAfterYoungKey = "HornetAfterYoung";
-
+        public static string findKonpanionConversationKey = "findKonpanion";
         public static void AddCustomDialogue(CustomDialogueManager cdm){
             cdm.AddConversation(hornetConversationKey,"Did I make the right choice? Coming back...<page>Opening it took almost all my strength, that gate made of void and dreams<page>But with that, I now have a chance... This world can survive... It has to...");
             cdm.AddConversation(hornetAfterYoungKey,"I was such a fool, believing my actions to be noble<page>If only I had aided the vessel earlier, perhaps things would be different?<page>No matter, I will correct my mistakes.");
+            cdm.AddConversation(findKonpanionConversationKey,"Oh? Another vessel that tries?<page>If you wish to accompany me, I wont stop you.");
+
             cdm.OnEndPage((string conversation,int currentPage)=>{
-                if(hornetConversationKey != conversation) { return; }
                 //Log(conversation+":"+currentPage);
+                if(findKonpanionConversationKey == conversation){
+                    Silksong.settings.HasKonpanion = true;
+                }
             });
             cdm.OnEndConversation((string conversation)=>{
                 if(hornetConversationKey != conversation) { return; }

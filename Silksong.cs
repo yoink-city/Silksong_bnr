@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using static Silksong.Helpers;
 namespace Silksong
 {
-    public class Silksong : Mod
+    public class Silksong : Mod, ICustomMenuMod,ILocalSettings<ModSettings>
     {
 
         internal static Silksong Instance;
@@ -29,6 +29,12 @@ namespace Silksong
             
         public override string GetVersion() => "v0.4.0 - 1";
         public new string GetName() => "Silksong (but not really)";
+
+        public static ModSettings settings { get; set; } = new ModSettings();
+        public void OnLoadLocal(ModSettings s) => settings = s;
+        public ModSettings OnSaveLocal() => settings;
+
+        public bool ToggleButtonInsideMenu => false;
 
         public Silksong()
         {
@@ -66,18 +72,27 @@ namespace Silksong
                 Dialogue.AddCustomDialogue(customDialogueManager);
             }
         }
-
-        public void SceneChange(Scene scene,LoadSceneMode mode){
+        private IEnumerator InitCards(){
+            yield return null;
+            var scene = SceneUtils.getCurrentScene();
             Log(scene.name);
             if(scene.name == "Town"){
                 CreateCard(CardPrefab,new Vector3(190f,7.3f,0)).GetAddCustomArrowPrompt(()=>{
                     customDialogueManager.ShowDialogue(Dialogue.hornetConversationKey);
                 });
+                if(!Silksong.settings.HasKonpanion){
+                    CreateKonpanionCard(CardPrefab,new Vector3(193f,7.3f,0)).GetAddCustomArrowPrompt(()=>{
+                        customDialogueManager.ShowDialogue(Dialogue.findKonpanionConversationKey);
+                    });
+                }
             } else if(scene.name == "Fungus1_04"){
                 CreateCard(CardPrefab,new Vector3(10f,27.5f,0)).GetAddCustomArrowPrompt(()=>{
                     customDialogueManager.ShowDialogue(Dialogue.hornetAfterYoungKey);
                 });
             }
+        }
+        public void SceneChange(Scene scene,LoadSceneMode mode){
+            GameManager.instance.StartCoroutine(InitCards());
         }
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
@@ -144,6 +159,12 @@ namespace Silksong
             Object.DontDestroyOnLoad(ControllerGo);
         }
         
+        public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates)
+        {
+            Menu.saveModsMenuScreen(modListMenu);
+            return Menu.CreatemenuScreen();
+        }
+
         private void Logger(string text)
         {
             Modding.Logger.Log($":[Silksong]:{text}");

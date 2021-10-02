@@ -20,7 +20,7 @@ namespace Silksong.Hornet {
         private tk2dSpriteAnimator source,destination; 
         private Hornets CurrentHornet = Hornets.NPC;
         private bool initialised = false;
-
+        private GameObject Konpanion;
         private IEnumerator CreateChangelings(){
             yield return new WaitWhile(() => {
                 return HeroController.instance == null || HeroController.instance.gameObject == null;
@@ -105,19 +105,29 @@ namespace Silksong.Hornet {
             GameObject.Find(WhatToMakeInvis).GetComponent<MeshRenderer>().enabled = false;
         }
 
+        private void HandleKonpanion(){
+
+            if((Silksong.settings.HasKonpanion && Silksong.settings.enableKonpanion) && Konpanion == null){
+                Konpanion = Helpers.createKnightCompanion();
+            }
+            if(!(Silksong.settings.HasKonpanion && Silksong.settings.enableKonpanion) && Konpanion != null){
+                Destroy(Konpanion);
+            }
+        }
+
         private void HeroUpdate()
         {   
             
             HeroController.instance.gameObject.GetComponent<MeshRenderer>().enabled = false;
             ChangeToHornet();
             ImitateClips();
-
-            if(Input.GetKeyDown(KeyCode.K)){
+            HandleKonpanion();
+            /*if(Input.GetKeyDown(KeyCode.K)){
                 HeroController.instance.gameObject.logTk2dAnimationClips();
                 BossGo.logTk2dAnimationClips();
                 NpcGo.logTk2dAnimationClips();
                 GameObjectUtils.PrintAllActiveGameObjectsInScene();  
-            }
+            }*/
         }
         
         private void ChangeToHornet()

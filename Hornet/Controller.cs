@@ -51,7 +51,7 @@ namespace Silksong.Hornet {
             CurrentHornet = Hornets.NPC;
         }
 
-        private void FsmEdit(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
+       private void FsmEdit(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             if (self.FsmName == "Knight Death Control")
             {
@@ -61,7 +61,7 @@ namespace Silksong.Hornet {
                 self.InsertMethod("Stab",() => source.Play("Spike Death Antic"),0);
                 self.InsertMethod("Fling",() => source.Play("Spike Death"),0);
                 
-                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(DestroyGo("Knight Spike Death(Clone)")),0);
+                self.InsertMethod("Stab", () => GameManager.instance.StartCoroutine(DestroyGoAfterFrame("Knight Spike Death(Clone)")),0);
             }
             else if (self.FsmName == "Hero Death Anim")
             {
@@ -88,14 +88,20 @@ namespace Silksong.Hornet {
             }
             else if (self.FsmName == "Knight Acid Death")
             {
-                self.InsertMethod("Start", () => GameManager.instance.StartCoroutine(DestroyGo("Knight Acid Death(Clone)")),0);
+                self.InsertMethod("Start", () => DestroyGo("Knight Acid Death(Clone)"),0);
+                self.InsertMethod("Start", () => source.Play("Acid Death"),0);
             }
             orig(self);
         }
 
-        private IEnumerator DestroyGo(string WhatToKill)
+        private IEnumerator DestroyGoAfterFrame(string WhatToKill)
         {
             yield return null;
+            Destroy(GameObject.Find(WhatToKill));
+        }
+        
+        private void DestroyGo(string WhatToKill)
+        {
             Destroy(GameObject.Find(WhatToKill));
         }
         

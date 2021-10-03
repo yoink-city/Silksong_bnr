@@ -160,11 +160,21 @@ namespace Silksong
             return Menu.CreatemenuScreen();
         }
 
-        private void Logger(string text)
+        private void Logger(string text, int mode = 3)
         {
-            Modding.Logger.Log($":[Silksong]:{text}");
-            Debug.Log($"[Silksong]:{text}");
+            if (mode == 1)
+            {
+                Debug.Log($"[Silksong]: {text}");
+            }
+            else if (mode == 2)
+            {
+                Modding.Logger.Log($"[Silksong]: {text}");
+            }
+            else if (mode == 3)
+            {
+                Modding.Logger.Log($"[Silksong]: {text}");
+                Debug.Log($"[Silksong]: {text}");
+            }
         }
-
     }
 }
